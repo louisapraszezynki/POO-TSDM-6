@@ -111,7 +111,7 @@ class Game:
         for unit in self.player_units + self.enemy_units:
             unit.draw(self.screen)
 
-        # Rafraîchit l'écran
+        # Rafraîchit l'écran éééé
         pygame.display.flip()
 
 
