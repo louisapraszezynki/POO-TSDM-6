@@ -44,7 +44,7 @@ class Unit:
         Dessine l'unité sur la grille.
     """
 
-    def __init__(self, x, y, health, attack_power,resistance , speed, team):
+    def __init__(self, x, y, health, attack_power,resistance , speed, team , unit_type):
         """
         Construit une unité avec une position, une santé, une puissance d'attaque et une équipe.
 
@@ -60,6 +60,7 @@ class Unit:
             La puissance d'attaque de l'unité.
         team : str
             L'équipe de l'unité ('player' ou 'enemy').
+            unit_type : str : Type de l'unité ('mage', 'chevalier', ou 'archer')
         """
         self.x = x
         self.y = y
@@ -68,6 +69,7 @@ class Unit:
         self.speed = speed
         self.attack_power = attack_power
         self.team = team  # 'player' ou 'enemy'
+        self.unit_type= unit_type
         self.is_selected = False
 
     def move(self, dx, dy):
@@ -83,9 +85,26 @@ class Unit:
 
     def draw(self, screen):
         """Affiche l'unité sur l'écran."""
-        color = BLUE if self.team == 'player' else RED
+        # Couleurs par défaut
+        if self.team == 'player':
+            if self.unit_type == 'mage':
+                color = (0, 0, 255)  # Bleu
+            elif self.unit_type == 'chevalier':
+                color = (0, 255, 0)  # Vert
+            elif self.unit_type == 'archer':
+                color = (255, 255, 0)  # Jaune
+        else:
+            if self.unit_type == 'mage':
+                color = (128, 0, 128)  # Violet
+            elif self.unit_type == 'chevalier':
+                color = (255, 0, 0)  # Rouge
+            elif self.unit_type == 'archer':
+                color = (255, 165, 0)  # Orange
+
+        # Dessin de l'unité
         if self.is_selected:
-            pygame.draw.rect(screen, GREEN, (self.x * CELL_SIZE,
-                             self.y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
-        pygame.draw.circle(screen, color, (self.x * CELL_SIZE + CELL_SIZE //
-                           2, self.y * CELL_SIZE + CELL_SIZE // 2), CELL_SIZE // 3)
+            pygame.draw.rect(screen, (0, 255, 255), (self.x * CELL_SIZE,
+                                                     self.y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+        pygame.draw.circle(screen, color, (self.x * CELL_SIZE + CELL_SIZE // 2,
+                                           self.y * CELL_SIZE + CELL_SIZE // 2), CELL_SIZE // 3)
+

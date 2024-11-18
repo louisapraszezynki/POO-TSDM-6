@@ -29,11 +29,17 @@ class Game:
             La surface de la fenêtre du jeu.
         """
         self.screen = screen
-        self.player_units = [Unit(0, 0, 10, 2, 'player'),
-                             Unit(1, 0, 10, 2, 'player')]
+        self.player_units = [
+            Unit(0, 0, 50, 40, 10, 4, 'player', 'mage'),  # Mage
+            Unit(1, 0, 100, 20, 30, 2, 'player', 'chevalier'),  # Chevalier
+            Unit(2, 0, 70, 25, 5, 3, 'player', 'archer')  # Archer
+        ]
 
-        self.enemy_units = [Unit(6, 6, 8, 1, 'enemy'),
-                            Unit(7, 6, 8, 1, 'enemy')]
+        self.enemy_units = [
+            Unit(6, 6, 50, 40, 10, 4, 'enemy', 'mage'),  # Mage
+            Unit(7, 6, 100, 20, 30, 2, 'enemy', 'chevalier'),  # Chevalier
+            Unit(5, 6, 70, 25, 5, 3, 'enemy', 'archer')  # Archer
+        ]
 
     def handle_player_turn(self):
 
