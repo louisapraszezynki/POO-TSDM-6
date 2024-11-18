@@ -36,8 +36,10 @@ class Game:
                             Unit(7, 6, 8, 1, 'enemy')]
 
     def handle_player_turn(self):
+
         """Tour du joueur"""
         for selected_unit in self.player_units:
+            movement = 0
 
             # Tant que l'unité n'a pas terminé son tour
             has_acted = False
@@ -53,19 +55,26 @@ class Game:
                         pygame.quit()
                         exit()
 
+                    player_movement_limit = 5
+
                     # Gestion des touches du clavier
                     if event.type == pygame.KEYDOWN:
 
                         # Déplacement (touches fléchées)
                         dx, dy = 0, 0
-                        if event.key == pygame.K_LEFT:
-                            dx = -1
-                        elif event.key == pygame.K_RIGHT:
-                            dx = 1
-                        elif event.key == pygame.K_UP:
-                            dy = -1
-                        elif event.key == pygame.K_DOWN:
-                            dy = 1
+                        if movement < player_movement_limit:
+                            if event.key == pygame.K_LEFT:
+                                dx = -1
+                                movement +=1
+                            elif event.key == pygame.K_RIGHT:
+                                dx = 1
+                                movement +=1
+                            elif event.key == pygame.K_UP:
+                                dy = -1
+                                movement +=1
+                            elif event.key == pygame.K_DOWN:
+                                dy = 1
+                                movement +=1
 
                         selected_unit.move(dx, dy)
                         self.flip_display()
@@ -111,7 +120,7 @@ class Game:
         for unit in self.player_units + self.enemy_units:
             unit.draw(self.screen)
 
-        # Rafraîchit l'écran éééé
+        # Rafraîchit l'écran
         pygame.display.flip()
 
 
