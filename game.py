@@ -42,10 +42,10 @@ class Game:
         ]
 
     def handle_player_turn(self):
-
         """Tour du joueur"""
         for selected_unit in self.player_units:
-            movement = 0
+            movement = 0  # Compteur de mouvement
+            player_movement_limit = selected_unit.speed  # Limite en fonction de la vitesse de l'unité
 
             # Tant que l'unité n'a pas terminé son tour
             has_acted = False
@@ -61,29 +61,27 @@ class Game:
                         pygame.quit()
                         exit()
 
-                    player_movement_limit = 5
-
                     # Gestion des touches du clavier
                     if event.type == pygame.KEYDOWN:
-
-                        # Déplacement (touches fléchées)
                         dx, dy = 0, 0
-                        if movement < player_movement_limit:
+
+                        # Déplacement (limité par la vitesse)
+                        if movement < player_movement_limit:  # Vérification de la limite
                             if event.key == pygame.K_LEFT:
                                 dx = -1
-                                movement +=1
+                                movement += 1
                             elif event.key == pygame.K_RIGHT:
                                 dx = 1
-                                movement +=1
+                                movement += 1
                             elif event.key == pygame.K_UP:
                                 dy = -1
-                                movement +=1
+                                movement += 1
                             elif event.key == pygame.K_DOWN:
                                 dy = 1
-                                movement +=1
+                                movement += 1
 
-                        selected_unit.move(dx, dy)
-                        self.flip_display()
+                            selected_unit.move(dx, dy)
+                            self.flip_display()
 
                         # Attaque (touche espace) met fin au tour
                         if event.key == pygame.K_SPACE:
