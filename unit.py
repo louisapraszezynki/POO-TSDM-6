@@ -44,7 +44,7 @@ class Unit:
         Dessine l'unité sur la grille.
     """
 
-    def __init__(self, x, y, health, attack_power,resistance , speed, team , unit_type):
+    def __init__(self, x, y, health, attack_power, resistance, speed, team , unit_type):
         """
         Construit une unité avec une position, une santé, une puissance d'attaque et une équipe.
 
@@ -69,7 +69,7 @@ class Unit:
         self.speed = speed
         self.attack_power = attack_power
         self.team = team  # 'player' ou 'enemy'
-        self.unit_type= unit_type
+        self.unit_type = unit_type # 'MAGE' ou 'CHEVALIER' ou 'ARCHER'
         self.is_selected = False
 
     def move(self, dx, dy):
@@ -107,4 +107,37 @@ class Unit:
                                                      self.y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
         pygame.draw.circle(screen, color, (self.x * CELL_SIZE + CELL_SIZE // 2,
                                            self.y * CELL_SIZE + CELL_SIZE // 2), CELL_SIZE // 3)
+
+# Définition des sous-classes des différentes unités
+class Mage(Unit):
+
+    def __init__(self, x, y, health, attack_power, resistance, speed, team , unit_type):
+        super().__init__(x, y, health, attack_power, resistance, speed, team , unit_type)
+        self.health == 100
+        self.attack_power == 10
+        self.resistance == 8
+        self.speed == 4
+        self.unit-type == 'MAGE'
+
+class Chevalier(Unit):
+
+    def __init__(self, x, y, health, attack_power, resistance, speed, team , unit_type):
+        super().__init__(x, y, health, attack_power, resistance, speed, team , unit_type)
+        self.health == 120
+        self.attack_power == 12
+        self.resistance == 9
+        self.speed == 5
+        self.unit-type == 'CHEVALIER'
+
+class Archer(Unit):
+
+    def __init__(self, x, y, health, attack_power, resistance, speed, team , unit_type):
+        super().__init__(x, y, health, attack_power, resistance, speed, team , unit_type)
+        self.health == 100
+        self.attack_power == 11
+        self.resistance == 10
+        self.speed == 3
+        self.unit-type == 'ARCHER'
+
+
 
