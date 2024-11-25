@@ -61,6 +61,23 @@ class Unit:
         self.unit_type = unit_type # 'MAGE' ou 'CHEVALIER' ou 'ARCHER'
         self.is_selected = False
 
+    def draw_health_bar(self, screen):
+        """Dessine la barre de vie de l'unité."""
+        # Position de la barre (au-dessus de l'unité)
+        bar_width = CELL_SIZE - 10
+        bar_height = 5
+        bar_x = self.x * CELL_SIZE + 5
+        bar_y = self.y * CELL_SIZE - bar_height - 2
+
+        # Calcul de la largeur de la barre en fonction des PV restants
+        health_percentage = max(0, self.health / 100)  # Supposons que 100 est le max des PV
+        current_bar_width = int(bar_width * health_percentage)
+
+        # Barre de fond (gris)
+        pygame.draw.rect(screen, (100, 100, 100), (bar_x, bar_y, bar_width, bar_height))
+        # Barre de vie (vert)
+        pygame.draw.rect(screen, (0, 255, 0), (bar_x, bar_y, current_bar_width, bar_height))
+
     def move(self, dx, dy, terrain_grid):
         """Déplace l'unité en tenant compte des restrictions du terrain."""
         new_x = self.x + dx
@@ -112,6 +129,7 @@ class Unit:
                                                      self.y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
         pygame.draw.circle(screen, color, (self.x * CELL_SIZE + CELL_SIZE // 2,
                                            self.y * CELL_SIZE + CELL_SIZE // 2), CELL_SIZE // 3)
+        self.draw_health_bar(screen)
 
 
 # Sous-classes des unités
