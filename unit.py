@@ -14,6 +14,13 @@ BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
 ##################################################
 
+TERRAIN_TYPES = {
+    "plain": (200, 200, 200),  # Gris clair
+    "water": (0, 0, 255),      # Bleu
+    "fire": (255, 0, 0),       # Rouge
+    "wall": (50, 50, 50)       # Gris foncé
+}
+
 #### SuperClasse d'attaques ####
 class Skills:
     def __init__(self, attack_type, range, power, area_of_effect):
@@ -54,11 +61,26 @@ class Unit:
         self.unit_type = unit_type # 'MAGE' ou 'CHEVALIER' ou 'ARCHER'
         self.is_selected = False
 
-    def move(self, dx, dy):
-        """Déplace l'unité de dx, dy."""
-        if 0 <= self.x + dx < GRID_SIZE and 0 <= self.y + dy < GRID_SIZE:
-            self.x += dx
-            self.y += dy
+    def move(self, dx, dy, terrain_grid):
+        """Déplace l'unité en tenant compte des restrictions du terrain."""
+        new_x = self.x + dx
+        new_y = self.y + dy
+
+        # Vérifiez que la position cible est dans la grille
+        if 0 <= new_x < GRID_SIZE and 0 <= new_y < GRID_SIZE:
+            terrain_type = terrain_grid[new_y][new_x]
+
+            # Bloquez le déplacement sur un mur
+            if terrain_type == "wall":
+                return  # Pas de déplacement si c'est un mur
+
+            # Appliquez des effets selon le type de terrain
+            if terrain_type == "fire":
+                self.health -= 5  # Le feu inflige des dégâts
+
+            # Déplacez l'unité si le terrain est accessible
+            self.x = new_x
+            self.y = new_y
 
     def attack(self, target):
         """Attaque une unité cible."""

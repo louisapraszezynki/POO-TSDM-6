@@ -44,6 +44,8 @@ pygame.font.init()
 my_font = pygame.font.SysFont('Comic Sans MS', 30)
 
 
+
+
 ############################# CONSTANTES POUR LA SELECTION DE JOUEURS #############################
 NUM_PLAYERS_0 = 3
 NUM_PLAYERS_1 = 3
@@ -111,7 +113,17 @@ class Game:
 
         # On déclare que l'état initial de sélection des joueurs sera sur le premier joueur
         self.selected_character_in_menu = 0
-
+        # terrain types: plain, water, fire, wall
+        self.terrain_grid = [
+            ["plain", "plain", "water", "plain", "plain", "fire", "plain", "wall"],
+            ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"],
+            ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"],
+            ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"],
+            ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"],
+            ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"],
+            ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"],
+            ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"]
+        ]
 
     #### MENU DEMARRER - QUITTER ####
     def show_menu(self):
@@ -257,7 +269,7 @@ class Game:
                                 dy = 1
                                 movement += 1
 
-                            selected_unit.move(dx, dy)
+                            selected_unit.move(dx, dy , self.terrain_grid)
                             self.flip_display()
 
                         # Attaque (touche espace) met fin au tour
@@ -279,7 +291,7 @@ class Game:
             target = random.choice(self.player_units)
             dx = 1 if enemy.x < target.x else -1 if enemy.x > target.x else 0
             dy = 1 if enemy.y < target.y else -1 if enemy.y > target.y else 0
-            enemy.move(dx, dy)
+            enemy.move(dx, dy , self.terrain_grid)
 
             # Attaque si possible
             if abs(enemy.x - target.x) <= 1 and abs(enemy.y - target.y) <= 1:
@@ -289,20 +301,32 @@ class Game:
 
     def flip_display(self):
         """Affiche le jeu."""
-
-        # Affiche la grille
+        # Efface l'écran en noir
         self.screen.fill(BLACK)
-        for x in range(0, WIDTH, CELL_SIZE):
-            for y in range(0, HEIGHT, CELL_SIZE):
-                rect = pygame.Rect(x, y, CELL_SIZE, CELL_SIZE)
+
+        # Parcours de la grille et affichage des types de terrain
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                # Définir le rectangle de chaque cellule
+                rect = pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+
+                # Récupérer le type de terrain
+                terrain_type = self.terrain_grid[y][x]
+
+                # Remplir la cellule avec la couleur correspondante
+                pygame.draw.rect(self.screen, TERRAIN_TYPES[terrain_type], rect)
+
+                # Dessiner une bordure (blanche) autour de chaque cellule
                 pygame.draw.rect(self.screen, WHITE, rect, 1)
 
-        # Affiche les unités
+        # Affiche les unités sur la grille
         for unit in self.player_units + self.enemy_units:
             unit.draw(self.screen)
 
-        # Rafraîchit l'écran
+        # Rafraîchit l'affichage
         pygame.display.flip()
+
+    ()
 
 
 def main():
