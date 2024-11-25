@@ -1,7 +1,7 @@
 import pygame
 import random
 
-# Constantes
+################### Constantes ###################
 GRID_SIZE = 8
 CELL_SIZE = 60
 WIDTH = GRID_SIZE * CELL_SIZE
@@ -12,56 +12,38 @@ BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
+##################################################
+
+#### SuperClasse d'attaques ####
+class Skills:
+    def __init__(self, attack_type, range, power, area_of_effect):
+        self.attack_type = attack_type
+        self.range = range
+        self.power = power
+        self.area_of_effect = area_of_effect
+    
+
+# Sous-classes d'attaques
+class Spell(Skills):
+    def __init__(self, attack_type, range, power, area_of_effect):
+        super().__init__(attack_type, range, power, area_of_effect)
+        self.attack_type == 'spell'
+
+class Weapon(Skills):
+    def __init__(self, attack_type, range, power, area_of_effect):
+        super().__init__(attack_type, range, power, area_of_effect)
+        self.attack_type == 'weapon'
+
+class Regen(Skills):
+    def __init__(self, attack_type, range, power, area_of_effect):
+        super().__init__(attack_type, range, power, area_of_effect)
+        self.attack_type == 'regen'
 
 
+#### SuperClasse des Unités ###
 class Unit:
-    """
-    Classe pour représenter une unité.
-
-    ...
-    Attributs
-    ---------
-    x : int
-        La position x de l'unité sur la grille.
-    y : int
-        La position y de l'unité sur la grille.
-    health : int
-        La santé de l'unité.
-    attack_power : int
-        La puissance d'attaque de l'unité.
-    team : str
-        L'équipe de l'unité ('player' ou 'enemy').
-    is_selected : bool
-        Si l'unité est sélectionnée ou non.
-
-    Méthodes
-    --------
-    move(dx, dy)
-        Déplace l'unité de dx, dy.
-    attack(target)
-        Attaque une unité cible.
-    draw(screen)
-        Dessine l'unité sur la grille.
-    """
 
     def __init__(self, x, y, health, attack_power, resistance, speed, team , unit_type):
-        """
-        Construit une unité avec une position, une santé, une puissance d'attaque et une équipe.
-
-        Paramètres
-        ----------
-        x : int
-            La position x de l'unité sur la grille.
-        y : int
-            La position y de l'unité sur la grille.
-        health : int
-            La santé de l'unité.
-        attack_power : int
-            La puissance d'attaque de l'unité.
-        team : str
-            L'équipe de l'unité ('player' ou 'enemy').
-            unit_type : str : Type de l'unité ('mage', 'chevalier', ou 'archer')
-        """
         self.x = x
         self.y = y
         self.health = health
@@ -85,7 +67,8 @@ class Unit:
 
     def draw(self, screen):
         """Affiche l'unité sur l'écran."""
-        # Couleurs par défaut
+
+        # Couleurs des unités
         if self.team == 'player':
             if self.unit_type == 'mage':
                 color = (0, 0, 255)  # Bleu
@@ -95,11 +78,11 @@ class Unit:
                 color = (255, 255, 0)  # Jaune
         else:
             if self.unit_type == 'mage':
-                color = (128, 0, 128)  # Violet
+                color = (0, 0, 255)  # Bleu
             elif self.unit_type == 'chevalier':
-                color = (255, 0, 0)  # Rouge
+                color = (0, 255, 0)  # Vert
             elif self.unit_type == 'archer':
-                color = (255, 165, 0)  # Orange
+                color = (255, 255, 0)  # Jaune
 
         # Dessin de l'unité
         if self.is_selected:
@@ -108,16 +91,20 @@ class Unit:
         pygame.draw.circle(screen, color, (self.x * CELL_SIZE + CELL_SIZE // 2,
                                            self.y * CELL_SIZE + CELL_SIZE // 2), CELL_SIZE // 3)
 
-# Définition des sous-classes des différentes unités
+
+# Sous-classes des unités
 class Mage(Unit):
 
     def __init__(self, x, y, health, attack_power, resistance, speed, team , unit_type):
         super().__init__(x, y, health, attack_power, resistance, speed, team , unit_type)
         self.health == 100
         self.attack_power == 10
-        self.resistance == 8
+        self.resistance == 10
         self.speed == 4
-        self.unit-type == 'MAGE'
+        self.unit_type == 'MAGE'
+
+    skills = [Spell('spell', 4, 3, 3), Regen('regen', 3, 7, 3)]
+
 
 class Chevalier(Unit):
 
@@ -125,9 +112,12 @@ class Chevalier(Unit):
         super().__init__(x, y, health, attack_power, resistance, speed, team , unit_type)
         self.health == 120
         self.attack_power == 12
-        self.resistance == 9
+        self.resistance == 7
         self.speed == 5
-        self.unit-type == 'CHEVALIER'
+        self.unit_type == 'CHEVALIER'
+    
+    skills = [Weapon('weapon', 1, 1, 1), Regen('regen', 1, 3, 1)]
+
 
 class Archer(Unit):
 
@@ -135,9 +125,8 @@ class Archer(Unit):
         super().__init__(x, y, health, attack_power, resistance, speed, team , unit_type)
         self.health == 100
         self.attack_power == 11
-        self.resistance == 10
+        self.resistance == 12
         self.speed == 3
-        self.unit-type == 'ARCHER'
-
-
-
+        self.unit_type == 'ARCHER'
+    
+    skills = [Weapon('weapon', 6, 1, 2), Regen('regen', 1, 2, 1)]
