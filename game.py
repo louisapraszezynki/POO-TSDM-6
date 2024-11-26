@@ -3,6 +3,20 @@ import random
 
 from unit import *
 
+############## Images terrain ##########################
+TILE_SIZE = 32
+
+terrain_images = {}
+for terrain, data in TERRAIN_TYPES.items():
+    terrain_images[terrain] = pygame.image.load(data["image"])
+
+terrain_images[terrain] = pygame.transform.scale(
+    terrain_images[terrain],
+    (TILE_SIZE, TILE_SIZE)
+)
+########################################################
+
+
 class Coordinates:
     x: int
     y: int
@@ -113,6 +127,7 @@ class Game:
 
         # On déclare que l'état initial de sélection des joueurs sera sur le premier joueur
         self.selected_character_in_menu = 0
+        
         # terrain types: plain, water, fire, wall
         self.terrain_grid = [
             ["plain", "plain", "water", "plain", "plain", "fire", "plain", "wall"],
@@ -305,19 +320,25 @@ class Game:
         self.screen.fill(BLACK)
 
         # Parcours de la grille et affichage des types de terrain
+        # for y in range(GRID_SIZE):
+        #     for x in range(GRID_SIZE):
+        #         # Définir le rectangle de chaque cellule
+        #         rect = pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+
+        #         # Récupérer le type de terrain
+        #         terrain_type = self.terrain_grid[y][x]
+
+        #         # Remplir la cellule avec la couleur correspondante
+        #         pygame.draw.rect(self.screen, TERRAIN_TYPES[terrain_type], rect)
+
+        #         # Dessiner une bordure (blanche) autour de chaque cellule
+        #         pygame.draw.rect(self.screen, WHITE, rect, 1)
+
         for y in range(GRID_SIZE):
             for x in range(GRID_SIZE):
-                # Définir le rectangle de chaque cellule
-                rect = pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
-
-                # Récupérer le type de terrain
-                terrain_type = self.terrain_grid[y][x]
-
-                # Remplir la cellule avec la couleur correspondante
-                pygame.draw.rect(self.screen, TERRAIN_TYPES[terrain_type], rect)
-
-                # Dessiner une bordure (blanche) autour de chaque cellule
-                pygame.draw.rect(self.screen, WHITE, rect, 1)
+                a = x * TILE_SIZE
+                b = y * TILE_SIZE
+                self.screen.blit(terrain_images[terrain], (a, b))
 
         # Affiche les unités sur la grille
         for unit in self.player_units + self.enemy_units:

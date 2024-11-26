@@ -15,10 +15,10 @@ GREEN = (0, 255, 0)
 ##################################################
 
 TERRAIN_TYPES = {
-    "plain": (200, 200, 200),  # Gris clair
-    "water": (0, 0, 255),      # Bleu
-    "fire": (255, 0, 0),       # Rouge
-    "wall": (50, 50, 50)       # Gris foncé
+    "plain": {"color": (200, 200, 200), "image": "C:/Users/louis/OneDrive/Bureau/M1 EEA/2. Python POO/Projet/images/terrain.png"},
+    "water": {"color": (0, 0, 255), "image": "C:/Users/louis/OneDrive/Bureau/M1 EEA/2. Python POO/Projet/images/water.png"},
+    "fire": {"color": (255, 0, 0), "image": "C:/Users/louis/OneDrive/Bureau/M1 EEA/2. Python POO/Projet/images/lava.png"},
+    "wall": {"color": (50, 50, 50), "image": "C:/Users/louis/OneDrive/Bureau/M1 EEA/2. Python POO/Projet/images/mur.png"}
 }
 
 #### SuperClasse d'attaques ####
@@ -73,8 +73,8 @@ class Unit:
         health_percentage = max(0, self.health / 100)  # Supposons que 100 est le max des PV
         current_bar_width = int(bar_width * health_percentage)
 
-        # Barre de fond (gris)
-        pygame.draw.rect(screen, (100, 100, 100), (bar_x, bar_y, bar_width, bar_height))
+        # Barre de fond (rouge)
+        pygame.draw.rect(screen, (255, 0, 0), (bar_x, bar_y, bar_width, bar_height))
         # Barre de vie (vert)
         pygame.draw.rect(screen, (0, 255, 0), (bar_x, bar_y, current_bar_width, bar_height))
 
