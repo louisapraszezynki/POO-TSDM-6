@@ -1,25 +1,35 @@
 import pygame
-import random
+from utilitaires import *
 
-################### Constantes ###################
-GRID_SIZE = 8
-CELL_SIZE = 60
-WIDTH = GRID_SIZE * CELL_SIZE
-HEIGHT = GRID_SIZE * CELL_SIZE
-FPS = 30
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-RED = (255, 0, 0)
-BLUE = (0, 0, 255)
-GREEN = (0, 255, 0)
-##################################################
 
-TERRAIN_TYPES = {
-    "plain": {"color": (200, 200, 200), "image": "C:/Users/louis/OneDrive/Bureau/M1 EEA/2. Python POO/Projet/images/terrain.png"},
-    "water": {"color": (0, 0, 255), "image": "C:/Users/louis/OneDrive/Bureau/M1 EEA/2. Python POO/Projet/images/water.png"},
-    "fire": {"color": (255, 0, 0), "image": "C:/Users/louis/OneDrive/Bureau/M1 EEA/2. Python POO/Projet/images/lava.png"},
-    "wall": {"color": (50, 50, 50), "image": "C:/Users/louis/OneDrive/Bureau/M1 EEA/2. Python POO/Projet/images/mur.png"}
-}
+
+
+def display_character(
+    screen,
+    coordinates,
+    class_type,
+    selected: bool,
+    in_menu: bool = False
+):
+    # Si le personnage actuellement en train d'être selectionné est celui-ci, alors on fait un cercle blanc
+    # un peu plus large derrière pour le distinguer
+    if selected:
+        pygame.draw.rect(screen, RED,
+                         (coordinates.x - 2, coordinates.y - 2, coordinates.width + 4, coordinates.height + 4), width=3)
+
+        unit_class = UNIT_CLASSES[class_type]
+        health = unit_class.health
+        attack_power = unit_class.attack_power
+        full_string = f"Health: {health}, Attack power: {attack_power}"
+
+        start_text_surface = font.render(full_string, False, WHITE)
+        screen.blit(start_text_surface, (MARGIN, HEIGHT - 50))
+
+    if in_menu:
+        screen.blit(MENU_UNIT_IMAGES[class_type], (coordinates.x, coordinates.y))
+    else:
+        screen.blit(UNIT_IMAGES[class_type], (coordinates.x, coordinates.y))
+
 
 #### SuperClasse d'attaques ####
 class Skills:
@@ -34,31 +44,31 @@ class Skills:
 class Spell(Skills):
     def __init__(self, attack_type, range, power, area_of_effect):
         super().__init__(attack_type, range, power, area_of_effect)
-        self.attack_type == 'spell'
+        self.attack_type = 'spell'
 
 class Weapon(Skills):
     def __init__(self, attack_type, range, power, area_of_effect):
         super().__init__(attack_type, range, power, area_of_effect)
-        self.attack_type == 'weapon'
+        self.attack_type = 'weapon'
 
 class Regen(Skills):
     def __init__(self, attack_type, range, power, area_of_effect):
         super().__init__(attack_type, range, power, area_of_effect)
-        self.attack_type == 'regen'
+        self.attack_type = 'regen'
 
 
 #### SuperClasse des Unités ###
 class Unit:
+    health = None
+    resistance = None
+    attack_power = None
+    unit_type = None # 'MAGE' ou 'CHEVALIER' ou 'ARCHER'
 
-    def __init__(self, x, y, health, attack_power, resistance, speed, team , unit_type):
+
+    def __init__(self, x, y, team):
         self.x = x
         self.y = y
-        self.health = health
-        self.resistance = resistance
-        self.speed = speed
-        self.attack_power = attack_power
         self.team = team  # 'player' ou 'enemy'
-        self.unit_type = unit_type # 'MAGE' ou 'CHEVALIER' ou 'ARCHER'
         self.is_selected = False
 
     def draw_health_bar(self, screen):
@@ -106,67 +116,83 @@ class Unit:
 
     def draw(self, screen):
         """Affiche l'unité sur l'écran."""
+        gauche_de_case = self.x * CELL_SIZE + (CELL_SIZE - UNIT_CELL_SIZE) / 2
+        haut_de_case = self.y * CELL_SIZE + (CELL_SIZE - UNIT_CELL_SIZE) / 2
 
-        # Couleurs des unités
-        if self.team == 'player':
-            if self.unit_type == 'mage':
-                color = (0, 0, 255)  # Bleu
-            elif self.unit_type == 'chevalier':
-                color = (0, 255, 0)  # Vert
-            elif self.unit_type == 'archer':
-                color = (255, 255, 0)  # Jaune
-        else:
-            if self.unit_type == 'mage':
-                color = (0, 0, 255)  # Bleu
-            elif self.unit_type == 'chevalier':
-                color = (0, 255, 0)  # Vert
-            elif self.unit_type == 'archer':
-                color = (255, 255, 0)  # Jaune
+        coordinates = Coordinates(gauche_de_case, haut_de_case, UNIT_CELL_SIZE, UNIT_CELL_SIZE)
+        display_character(screen, coordinates, self.unit_type, self.is_selected)
 
-        # Dessin de l'unité
-        if self.is_selected:
-            pygame.draw.rect(screen, (0, 255, 255), (self.x * CELL_SIZE,
-                                                     self.y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
-        pygame.draw.circle(screen, color, (self.x * CELL_SIZE + CELL_SIZE // 2,
-                                           self.y * CELL_SIZE + CELL_SIZE // 2), CELL_SIZE // 3)
         self.draw_health_bar(screen)
 
 
-# Sous-classes des unités
 class Mage(Unit):
-
-    def __init__(self, x, y, health, attack_power, resistance, speed, team , unit_type):
-        super().__init__(x, y, health, attack_power, resistance, speed, team , unit_type)
-        self.health == 100
-        self.attack_power == 10
-        self.resistance == 10
-        self.speed == 4
-        self.unit_type == 'MAGE'
-
-    skills = [Spell('spell', 4, 3, 3), Regen('regen', 3, 7, 3)]
+    health = 100
+    attack_power = 10
+    resistance = 4
+    speed = 4
+    unit_type = 'MAGE'
+    skills = [
+        Spell('spell', 4, 3, 3),
+        Regen('regen', 3, 7, 3)
+    ]
 
 
 class Chevalier(Unit):
-
-    def __init__(self, x, y, health, attack_power, resistance, speed, team , unit_type):
-        super().__init__(x, y, health, attack_power, resistance, speed, team , unit_type)
-        self.health == 120
-        self.attack_power == 12
-        self.resistance == 7
-        self.speed == 5
-        self.unit_type == 'CHEVALIER'
-    
-    skills = [Weapon('weapon', 1, 1, 1), Regen('regen', 1, 3, 1)]
+    health = 120
+    attack_power = 12
+    resistance = 7
+    speed = 5
+    unit_type = 'CHEVALIER'
+    skills = [
+        Weapon('weapon', 1, 1, 1),
+        Regen('regen', 1, 3, 1)
+    ]
 
 
 class Archer(Unit):
+    health = 100
+    attack_power = 11
+    resistance = 12
+    speed = 3
+    unit_type = 'ARCHER'
+    skills = [
+        Weapon('weapon', 6, 1, 2),
+        Regen('regen', 1, 2, 1)
+    ]
 
-    def __init__(self, x, y, health, attack_power, resistance, speed, team , unit_type):
-        super().__init__(x, y, health, attack_power, resistance, speed, team , unit_type)
-        self.health == 100
-        self.attack_power == 11
-        self.resistance == 12
-        self.speed == 3
-        self.unit_type == 'ARCHER'
-    
-    skills = [Weapon('weapon', 6, 1, 2), Regen('regen', 1, 2, 1)]
+UNIT_TYPES = ["MAGE", "ARCHER", "CHEVALIER"]
+UNIT_CLASSES = {
+    'MAGE': Mage,
+    'CHEVALIER': Chevalier,
+    'ARCHER': Archer,
+}
+
+MENU_UNIT_IMAGES = {
+    "MAGE": pygame.transform.scale(
+        pygame.image.load("images/mage.png"),
+        (MENU_UNIT_CELL_SIZE, MENU_UNIT_CELL_SIZE)
+    ),
+    "CHEVALIER": pygame.transform.scale(
+        pygame.image.load("images/knight.png"),
+        (MENU_UNIT_CELL_SIZE, MENU_UNIT_CELL_SIZE)
+    ),
+    "ARCHER": pygame.transform.scale(
+        pygame.image.load("images/archer.png"),
+        (MENU_UNIT_CELL_SIZE, MENU_UNIT_CELL_SIZE)
+    ),
+}
+
+UNIT_IMAGES = {
+    "MAGE": pygame.transform.scale(
+        pygame.image.load("images/mage.png"),
+        (UNIT_CELL_SIZE, UNIT_CELL_SIZE)
+    ),
+    "CHEVALIER": pygame.transform.scale(
+        pygame.image.load("images/knight.png"),
+        (UNIT_CELL_SIZE, UNIT_CELL_SIZE)
+    ),
+    "ARCHER": pygame.transform.scale(
+        pygame.image.load("images/archer.png"),
+        (UNIT_CELL_SIZE, UNIT_CELL_SIZE)
+    ),
+}

@@ -2,35 +2,12 @@ import pygame
 import random
 
 from unit import *
-
-############## Images terrain ##########################
-TILE_SIZE = 32
-
-terrain_images = {}
-for terrain, data in TERRAIN_TYPES.items():
-    terrain_images[terrain] = pygame.image.load(data["image"])
-
-terrain_images[terrain] = pygame.transform.scale(
-    terrain_images[terrain],
-    (TILE_SIZE, TILE_SIZE)
-)
-########################################################
+from terrain import TERRAIN_TYPES, CELL_SIZE
+from utilitaires import *
 
 
-class Coordinates:
-    x: int
-    y: int
-    width: int
-    height: int
-
-    def __init__(self, x, y, width, height):
-        self.x = x
-        self.y = y
-        self.width = width
-        self.height = height
 
 
-MARGIN = 10
 
 ##################################### CONSTANTES POUR LE MENU #####################################
 MENU_ITEM_WIDTH = 150
@@ -52,36 +29,25 @@ EXIT_COORDINATES = Coordinates(
     width = MENU_ITEM_WIDTH,
     height = MENU_ITEM_HEIGHT
 )
-###################################################################################################
-
-pygame.font.init()
-my_font = pygame.font.SysFont('Comic Sans MS', 30)
-
-
-
-
 ############################# CONSTANTES POUR LA SELECTION DE JOUEURS #############################
-NUM_PLAYERS_0 = 3
-NUM_PLAYERS_1 = 3
-CIRCLE_RADIUS = 30
 
 THIRD_OF_WIDTH = int(WIDTH / 3)
 SIXTH_OF_WIDTH = int(WIDTH / 6)
 THIRD_OF_HEIGHT = int(HEIGHT / 3)
 
 PLAYER_0_MENU_COORDINATES = [Coordinates(
-    x = THIRD_OF_WIDTH * i + SIXTH_OF_WIDTH,
-    y = THIRD_OF_HEIGHT,
-    width = CIRCLE_RADIUS,
-    height = CIRCLE_RADIUS
+    x = THIRD_OF_WIDTH * i + SIXTH_OF_WIDTH - MENU_UNIT_CELL_SIZE / 2,
+    y = THIRD_OF_HEIGHT - MENU_UNIT_CELL_SIZE / 2,
+    width = MENU_UNIT_CELL_SIZE,
+    height = MENU_UNIT_CELL_SIZE
 ) for i in range(NUM_PLAYERS_0)]
 
 # La seule chose différente par rapport à au-dessus est le y -> 2/3 de la hauteur au lieu de 1/3
 PLAYER_1_MENU_COORDINATES = [Coordinates(
-    x = THIRD_OF_WIDTH * i + SIXTH_OF_WIDTH,
-    y = THIRD_OF_HEIGHT * 2,
-    width = CIRCLE_RADIUS,
-    height = CIRCLE_RADIUS
+    x = THIRD_OF_WIDTH * i + SIXTH_OF_WIDTH - MENU_UNIT_CELL_SIZE / 2,
+    y = THIRD_OF_HEIGHT * 2 - MENU_UNIT_CELL_SIZE / 2,
+    width = MENU_UNIT_CELL_SIZE,
+    height = MENU_UNIT_CELL_SIZE
 ) for i in range(NUM_PLAYERS_1)]
 ###################################################################################################
 
@@ -109,23 +75,16 @@ class Game:
         screen : pygame.Surface
             La surface de la fenêtre du jeu.
         """
-        self.screen = screen
-        self.player_units = [
-            Unit(0, 0, 50, 40, 10, 4, 'player', 'mage'),
-            Unit(1, 0, 100, 20, 30, 2, 'player', 'archer'),
-            Unit(2, 0, 70, 25, 5, 3, 'player', 'chevalier')
-        ]
+        self.player_units = []
+        self.enemy_units = []
 
-        self.enemy_units = [
-            Unit(6, 6, 50, 40, 10, 4, 'enemy', 'mage'),
-            Unit(7, 6, 100, 20, 30, 2, 'enemy', 'archer'),
-            Unit(5, 6, 70, 25, 5, 3, 'enemy', 'chevalier')
-        ]
+        self.screen = screen
 
         # On déclare que l'état initial du menu sera d'être sur "START".
         self.selected_menu_item = 'START'
 
         # On déclare que l'état initial de sélection des joueurs sera sur le premier joueur
+        # La valeur de cette variable se mettra à jour lorsque l'on appuie sur Espace/Return
         self.selected_character_in_menu = 0
         
         # terrain types: plain, water, fire, wall
@@ -139,6 +98,37 @@ class Game:
             ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"],
             ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"]
         ]
+
+
+        # Initialisation des unit types affichés
+        # On va essayer de mettre à jour cette liste pour que ça se change de manière dynamique
+        # en appuyant sur la fleche droite
+        self.unit_types = [0, 0, 0, 0, 0, 0]
+
+    def init_units(self):
+        # self.unit_types
+        # [0, 0, 0, 0, 0, 0]
+
+        # UNIT_TYPES = ["MAGE", "ARCHER", "CHEVALIER"]
+
+        # UNIT_CLASSES = {
+        #     'MAGE': Mage,
+        #     'CHEVALIER': Chevalier,
+        #     'ARCHER': Archer,
+        # }
+
+        self.player_units = [
+            UNIT_CLASSES[UNIT_TYPES[self.unit_types[0]]](0, 0, 'player'),
+            UNIT_CLASSES[UNIT_TYPES[self.unit_types[1]]](1, 0, 'player'),
+            UNIT_CLASSES[UNIT_TYPES[self.unit_types[2]]](2, 0, 'player'),
+        ]
+
+        self.enemy_units = [
+            UNIT_CLASSES[UNIT_TYPES[self.unit_types[3]]](6, 6, 'player'),
+            UNIT_CLASSES[UNIT_TYPES[self.unit_types[4]]](7, 6, 'player'),
+            UNIT_CLASSES[UNIT_TYPES[self.unit_types[5]]](5, 6, 'player'),
+        ]
+
 
     #### MENU DEMARRER - QUITTER ####
     def show_menu(self):
@@ -174,12 +164,12 @@ class Game:
 
             # On dessine le bouton start avec pour but qu'il soit au milieu, à gauche de l'écran
             start_button = pygame.Rect(START_COORDINATES.x, START_COORDINATES.y, START_COORDINATES.width, START_COORDINATES.height)
-            start_text_surface = my_font.render('START', False, WHITE)
+            start_text_surface = font.render('START', False, WHITE)
             self.screen.blit(start_text_surface, (START_COORDINATES.x + MARGIN, START_COORDINATES.y))
 
             # On dessine le bouton exit avec pour but qu'il soit au milieu, à droite de l'écran
             exit_button = pygame.Rect(EXIT_COORDINATES.x, EXIT_COORDINATES.y, EXIT_COORDINATES.width, EXIT_COORDINATES.height)
-            exit_text_surface = my_font.render('EXIT', False, WHITE)
+            exit_text_surface = font.render('EXIT', False, WHITE)
             self.screen.blit(exit_text_surface, (EXIT_COORDINATES.x + MARGIN, EXIT_COORDINATES.y))
 
             # On donne une épaisseur de 5 au bouton s'il est sélectionné, 1 sinon
@@ -204,6 +194,7 @@ class Game:
                 pygame.quit()
                 exit()
 
+
             # Gestion des touches du clavier
             if event.type == pygame.KEYDOWN:
                 # Si on appuie sur la barre espace, on passe au personnage suivant qu'il faudra sélectionner
@@ -220,24 +211,38 @@ class Game:
                     if self.selected_character_in_menu < 0:
                         self.selected_character_in_menu = 0
 
+
+                if event.key == pygame.K_RIGHT:
+                    current_value = self.unit_types[self.selected_character_in_menu]
+
+                    # On va chercher la classe suivante dans UNIT_TYPES
+                    current_value = current_value + 1
+
+                    # On a que trois classes, donc on prend le modulo
+                    current_value = current_value % 3
+
+                    self.unit_types[self.selected_character_in_menu] = current_value
+
             # On garde un index de personnage pour savoir si on est bien sur celui que nous sommes en train de changer
             character_index = 0
 
-            def display_character(coordinates, color, index):
-                # Si le personnage actuellement en train d'être selectionné est celui-ci, alors on fait un cercle blanc
-                # un peu plus large derrière pour le distinguer
-                if self.selected_character_in_menu == index:
-                    pygame.draw.circle(self.screen, WHITE, (coordinates.x, coordinates.y), coordinates.width + 3)
-
-                pygame.draw.circle(self.screen, color, (coordinates.x, coordinates.y), coordinates.width)
-
             for coordinates in PLAYER_0_MENU_COORDINATES:
-                display_character(coordinates, RED, character_index)
+                # Le type de l'unit qu'on est actuellement en train de dessiner (0, 1, 2)
+                current_unit_type = self.unit_types[character_index]
+                # On récupère le type sous forme de chaîne de caractère
+                current_unit_type = UNIT_TYPES[current_unit_type]
+
+                display_character(self.screen, coordinates, current_unit_type, character_index == self.selected_character_in_menu, in_menu=True)
                 # On passe au personnage suivant, alors on augmente le character index
                 character_index += 1
 
             for coordinates in PLAYER_1_MENU_COORDINATES:
-                display_character(coordinates, BLUE, character_index)
+                # Le type de l'unit qu'on est actuellement en train de dessiner (0, 1, 2)
+                current_unit_type = self.unit_types[character_index]
+                # On récupère le type sous forme de chaîne de caractère
+                current_unit_type = UNIT_TYPES[current_unit_type]
+
+                display_character(self.screen, coordinates, current_unit_type, character_index == self.selected_character_in_menu, in_menu=True)
                 # On passe au personnage suivant, alors on augmente le character index
                 character_index += 1
 
@@ -319,26 +324,11 @@ class Game:
         # Efface l'écran en noir
         self.screen.fill(BLACK)
 
-        # Parcours de la grille et affichage des types de terrain
-        # for y in range(GRID_SIZE):
-        #     for x in range(GRID_SIZE):
-        #         # Définir le rectangle de chaque cellule
-        #         rect = pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
-
-        #         # Récupérer le type de terrain
-        #         terrain_type = self.terrain_grid[y][x]
-
-        #         # Remplir la cellule avec la couleur correspondante
-        #         pygame.draw.rect(self.screen, TERRAIN_TYPES[terrain_type], rect)
-
-        #         # Dessiner une bordure (blanche) autour de chaque cellule
-        #         pygame.draw.rect(self.screen, WHITE, rect, 1)
-
         for y in range(GRID_SIZE):
             for x in range(GRID_SIZE):
-                a = x * TILE_SIZE
-                b = y * TILE_SIZE
-                self.screen.blit(terrain_images[terrain], (a, b))
+                a = x * CELL_SIZE
+                b = y * CELL_SIZE
+                self.screen.blit(TERRAIN_TYPES[self.terrain_grid[y][x]], (a, b))
 
         # Affiche les unités sur la grille
         for unit in self.player_units + self.enemy_units:
@@ -346,8 +336,6 @@ class Game:
 
         # Rafraîchit l'affichage
         pygame.display.flip()
-
-    ()
 
 
 def main():
@@ -371,6 +359,8 @@ def main():
     characters_chosen = False
     while not characters_chosen:
         characters_chosen = game.select_characters()
+
+    game.init_units()
 
     # Boucle principale du jeu
     while True:
