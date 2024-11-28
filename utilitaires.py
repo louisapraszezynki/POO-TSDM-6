@@ -2,7 +2,7 @@ import pygame
 
 ### Constantes
 GRID_SIZE = 8
-CELL_SIZE = 120
+CELL_SIZE = 100
 
 MENU_UNIT_CELL_SIZE = 240
 UNIT_CELL_SIZE = 80
@@ -22,7 +22,7 @@ NUM_PLAYERS_1 = 3
 
 # Police
 pygame.font.init()
-font = pygame.font.SysFont('Comic Sans MS', 30)
+font = pygame.font.SysFont('Arial Black', 25)
 
 # Classe coordonnées
 class Coordinates:

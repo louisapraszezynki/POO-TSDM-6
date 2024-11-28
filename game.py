@@ -51,30 +51,11 @@ PLAYER_1_MENU_COORDINATES = [Coordinates(
 ) for i in range(NUM_PLAYERS_1)]
 ###################################################################################################
 
-class Game:
-    """
-    Classe pour représenter le jeu.
 
-    ...
-    Attributs
-    ---------
-    screen: pygame.Surface
-        La surface de la fenêtre du jeu.
-    player_units : list[Unit]
-        La liste des unités du joueur.
-    enemy_units : list[Unit]
-        La liste des unités de l'adversaire.
-    """
+class Game:
 
     def __init__(self, screen):
-        """
-        Construit le jeu avec la surface de la fenêtre.
-
-        Paramètres
-        ----------
-        screen : pygame.Surface
-            La surface de la fenêtre du jeu.
-        """
+ 
         self.player_units = []
         self.enemy_units = []
 
@@ -251,7 +232,7 @@ class Game:
         return False
 
     def handle_player_turn(self):
-        """Tour du joueur"""
+        """Tours de jeu"""
         for selected_unit in self.player_units:
             movement = 0  # Compteur de mouvement
             player_movement_limit = selected_unit.speed  # Limite en fonction de la vitesse de l'unité
@@ -260,6 +241,7 @@ class Game:
             has_acted = False
             selected_unit.is_selected = True
             self.flip_display()
+
             while not has_acted:
 
                 # Important: cette boucle permet de gérer les événements Pygame
@@ -302,6 +284,10 @@ class Game:
 
                             has_acted = True
                             selected_unit.is_selected = False
+            
+        while selected_unit.is_selected is True:
+            selected_unit.draw_stats(self.screen)
+
 
     def handle_enemy_turn(self):
         """IA très simple pour les ennemis."""

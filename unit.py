@@ -3,7 +3,7 @@ from utilitaires import *
 
 
 
-
+# Affichage des types d'unités dans le menu de sélection des personnages
 def display_character(
     screen,
     coordinates,
@@ -11,7 +11,7 @@ def display_character(
     selected: bool,
     in_menu: bool = False
 ):
-    # Si le personnage actuellement en train d'être selectionné est celui-ci, alors on fait un cercle blanc
+    # Si le personnage actuellement en train d'être selectionné est celui-ci, alors on fait un carré blanc
     # un peu plus large derrière pour le distinguer
     if selected:
         pygame.draw.rect(screen, RED,
@@ -80,11 +80,12 @@ class Unit:
         bar_y = self.y * CELL_SIZE - bar_height - 2
 
         # Calcul de la largeur de la barre en fonction des PV restants
-        health_percentage = max(0, self.health / 100)  # Supposons que 100 est le max des PV
+        health_percentage = max(0, self.health / 100)
         current_bar_width = int(bar_width * health_percentage)
 
         # Barre de fond (rouge)
         pygame.draw.rect(screen, (255, 0, 0), (bar_x, bar_y, bar_width, bar_height))
+
         # Barre de vie (vert)
         pygame.draw.rect(screen, (0, 255, 0), (bar_x, bar_y, current_bar_width, bar_height))
 
@@ -105,6 +106,8 @@ class Unit:
             if terrain_type == "fire":
                 self.health -= 5  # Le feu inflige des dégâts
 
+            # Rajouter l'effet de la case eau
+
             # Déplacez l'unité si le terrain est accessible
             self.x = new_x
             self.y = new_y
@@ -124,6 +127,10 @@ class Unit:
 
         self.draw_health_bar(screen)
 
+    def draw_stats(self, screen):
+        action_string = f"Action possible 1 : {self.actions[0]}, Action possible 2 : {self.actions[1]}"
+        start_text_surface = font.render(action_string, False, WHITE)
+        screen.blit(start_text_surface, (MARGIN, HEIGHT - 100))
 
 class Mage(Unit):
     health = 100
@@ -131,9 +138,10 @@ class Mage(Unit):
     resistance = 4
     speed = 4
     unit_type = 'MAGE'
+    actions = ['Spell', 'Regen']
     skills = [
-        Spell('spell', 4, 3, 3),
-        Regen('regen', 3, 7, 3)
+        Spell('spell', 4, 3, 3), # attack_type, range, power, area_of_effect
+        Regen('regen', 3, 7, 3) # attack_type, range, power, area_of_effect
     ]
 
 
@@ -143,9 +151,10 @@ class Chevalier(Unit):
     resistance = 7
     speed = 5
     unit_type = 'CHEVALIER'
+    actions = ['Weapon', 'Regen']
     skills = [
-        Weapon('weapon', 1, 1, 1),
-        Regen('regen', 1, 3, 1)
+        Weapon('weapon', 1, 1, 1), # attack_type, range, power, area_of_effect
+        Regen('regen', 1, 3, 1) # attack_type, range, power, area_of_effect
     ]
 
 
@@ -155,10 +164,12 @@ class Archer(Unit):
     resistance = 12
     speed = 3
     unit_type = 'ARCHER'
+    actions = ['Weapon', 'Regen']
     skills = [
-        Weapon('weapon', 6, 1, 2),
-        Regen('regen', 1, 2, 1)
+        Weapon('weapon', 6, 1, 2), # attack_type, range, power, area_of_effect
+        Regen('regen', 1, 2, 1) # attack_type, range, power, area_of_effect
     ]
+
 
 UNIT_TYPES = ["MAGE", "ARCHER", "CHEVALIER"]
 UNIT_CLASSES = {
