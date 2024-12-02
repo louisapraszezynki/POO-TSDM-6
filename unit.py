@@ -60,6 +60,7 @@ class Regen(Skills):
 #### SuperClasse des Unités ###
 class Unit:
     health = None
+    max_health = None
     resistance = None
     attack_power = None
     unit_type = None # 'MAGE' ou 'CHEVALIER' ou 'ARCHER'
@@ -80,8 +81,8 @@ class Unit:
         bar_y = self.y * CELL_SIZE - bar_height - 2
 
         # Calcul de la largeur de la barre en fonction des PV restants
-        health_percentage = max(0, self.health / 100)
-        current_bar_width = int(bar_width * health_percentage)
+        health_percentage = (self.health*100) / self.max_health
+        current_bar_width = int((health_percentage*bar_width)/100)
 
         # Barre de fond (rouge)
         pygame.draw.rect(screen, (255, 0, 0), (bar_x, bar_y, bar_width, bar_height))
@@ -134,6 +135,7 @@ class Unit:
 
 class Mage(Unit):
     health = 100
+    max_health = 100
     attack_power = 10
     resistance = 4
     speed = 4
@@ -147,6 +149,7 @@ class Mage(Unit):
 
 class Chevalier(Unit):
     health = 120
+    max_health = 120
     attack_power = 12
     resistance = 7
     speed = 5
@@ -160,6 +163,7 @@ class Chevalier(Unit):
 
 class Archer(Unit):
     health = 100
+    max_health = 100
     attack_power = 11
     resistance = 12
     speed = 3

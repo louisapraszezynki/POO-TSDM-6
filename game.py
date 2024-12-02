@@ -336,12 +336,12 @@ def main():
     # Instanciation du jeu
     game = Game(screen)
 
-    # Avant de passer à la boucle principale du jeu, on passe par le menu.
+    # Avant de passer à la boucle principale du jeu, on passe par le menu démarrer
     game_ready_to_start = False
     while not game_ready_to_start:
         game_ready_to_start = game.show_menu()
 
-    # Avant de passer à la boucle principale du jeu, on passe par le menu.
+    # Avant de passer à la boucle principale du jeu, on passe par le menu de choix de personnages
     characters_chosen = False
     while not characters_chosen:
         characters_chosen = game.select_characters()
