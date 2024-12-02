@@ -91,7 +91,7 @@ class Unit:
         pygame.draw.rect(screen, (0, 255, 0), (bar_x, bar_y, current_bar_width, bar_height))
 
     def move(self, dx, dy, terrain_grid):
-        """Déplace l'unité en tenant compte des restrictions du terrain."""
+        # Déplace l'unité en tenant compte des restrictions du terrain
         new_x = self.x + dx
         new_y = self.y + dy
 
@@ -101,13 +101,19 @@ class Unit:
 
             # Bloquez le déplacement sur un mur
             if terrain_type == "wall":
-                return  # Pas de déplacement si c'est un mur
+                return
 
-            # Appliquez des effets selon le type de terrain
+            # Le feu inflige des dégâts
             if terrain_type == "fire":
-                self.health -= 5  # Le feu inflige des dégâts
+                self.health -= 5
 
-            # Rajouter l'effet de la case eau
+            # L'eau ralentit
+            if terrain_type == "water":
+                if self.speed > 0:
+                    self.speed -= 1
+                else:
+                    return 
+
 
             # Déplacez l'unité si le terrain est accessible
             self.x = new_x

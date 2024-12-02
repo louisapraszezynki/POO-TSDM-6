@@ -6,9 +6,6 @@ from terrain import TERRAIN_TYPES
 from utilitaires import *
 
 
-
-
-
 ##################################### CONSTANTES POUR LE MENU #####################################
 MENU_ITEM_WIDTH = 150
 MENU_ITEM_HEIGHT = 50
@@ -29,6 +26,8 @@ EXIT_COORDINATES = Coordinates(
     width = MENU_ITEM_WIDTH,
     height = MENU_ITEM_HEIGHT
 )
+
+
 ############################# CONSTANTES POUR LA SELECTION DE JOUEURS #############################
 
 THIRD_OF_WIDTH = int(WIDTH / 3)
@@ -81,7 +80,7 @@ class Game:
         ]
 
 
-        # Initialisation des unit types affichés
+        # Initialisation des unit types affichés dans le menu personnages
         # On va essayer de mettre à jour cette liste pour que ça se change de manière dynamique
         # en appuyant sur la fleche droite
         self.unit_types = [0, 0, 0, 0, 0, 0]
@@ -231,8 +230,9 @@ class Game:
 
         return False
 
+    #### TOURS DE JEU ###
     def handle_player_turn(self):
-        """Tours de jeu"""
+
         for selected_unit in self.player_units:
             movement = 0  # Compteur de mouvement
             player_movement_limit = selected_unit.speed  # Limite en fonction de la vitesse de l'unité
@@ -270,7 +270,7 @@ class Game:
                             elif event.key == pygame.K_DOWN:
                                 dy = 1
                                 movement += 1
-
+                        
                             selected_unit.move(dx, dy , self.terrain_grid)
                             self.flip_display()
 
@@ -306,8 +306,8 @@ class Game:
                     self.player_units.remove(target)
 
     def flip_display(self):
-        """Affiche le jeu."""
-        # Efface l'écran en noir
+    
+        # Remplit l'écran en noir
         self.screen.fill(BLACK)
 
         for y in range(GRID_SIZE):
@@ -324,6 +324,7 @@ class Game:
         pygame.display.flip()
 
 
+#### Main ####
 def main():
 
     # Initialisation de Pygame
@@ -352,7 +353,6 @@ def main():
     while True:
         game.handle_player_turn()
         game.handle_enemy_turn()
-
 
 if __name__ == "__main__":
     main()
