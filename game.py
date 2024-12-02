@@ -2,7 +2,7 @@ import pygame
 import random
 
 from unit import *
-from terrain import TERRAIN_TYPES, CELL_SIZE
+from terrain import TERRAIN_TYPES
 from utilitaires import *
 
 

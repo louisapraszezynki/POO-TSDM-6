@@ -1,6 +1,5 @@
 import pygame
-
-CELL_SIZE = 120
+from utilitaires import CELL_SIZE
 
 TERRAIN_TYPES = {
     "plain": pygame.transform.scale(
