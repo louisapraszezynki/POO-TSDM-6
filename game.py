@@ -81,7 +81,7 @@ class Game:
 
 
         # Initialisation des unit types affichés dans le menu personnages
-        # On va essayer de mettre à jour cette liste pour que ça se change de manière dynamique
+        # On veut mettre à jour cette liste pour que ça se change de manière dynamique
         # en appuyant sur la fleche droite
         self.unit_types = [0, 0, 0, 0, 0, 0]
 
@@ -230,7 +230,7 @@ class Game:
 
         return False
 
-    #### TOURS DE JEU ###
+    #### TOURS DE JEU ####
     def handle_player_turn(self):
 
         for selected_unit in self.player_units:
@@ -255,6 +255,7 @@ class Game:
                     # Gestion des touches du clavier
                     if event.type == pygame.KEYDOWN:
                         dx, dy = 0, 0
+                        sx, sy = 0, 0
 
                         # Déplacement (limité par la vitesse)
                         if movement < player_movement_limit:  # Vérification de la limite
@@ -271,23 +272,47 @@ class Game:
                                 dy = 1
                                 movement += 1
                         
-                            selected_unit.move(dx, dy , self.terrain_grid)
+                            selected_unit.move(dx, dy, self.terrain_grid)
                             self.flip_display()
 
-                        # Attaque (touche espace) met fin au tour
-                        if event.key == pygame.K_SPACE:
-                            for enemy in self.enemy_units:
-                                if abs(selected_unit.x - enemy.x) <= 1 and abs(selected_unit.y - enemy.y) <= 1:
-                                    selected_unit.attack(enemy)
-                                    if enemy.health <= 0:
-                                        self.enemy_units.remove(enemy)
+                        # Choix de l'action 
+                        if event.key == pygame.K_1:
+                            action_1_selected = True
 
+                            while action_1_selected:
+                                # Touches directionnelles = déplacement du carré rouge dans la zone en surbrillance
+                                if event.key == pygame.K_LEFT:
+                                    sx = -1
+                                elif event.key == pygame.K_RIGHT:
+                                    sx = 1
+                                elif event.key == pygame.K_UP:
+                                    sy = -1
+                                elif event.key == pygame.K_DOWN:
+                                    sy = 1
+
+                                # elif event.key == pygame.K_SPACE:
+                                    # get coordonnées de la cellule sélectionnée
+                                    # if (abs(dx) + abs(dy)) de la cellule sélectionnée < range: 
+                                    # unit de coordonnées de la cellule sélectionnée = target
+                                    # do selected_action sur target
+                                        # Attaque (touche espace)
+                                        # if event.key == pygame.K_SPACE:
+                                            # for enemy in self.enemy_units:
+                                                # if abs(selected_unit.x - enemy.x) <= 1 and abs(selected_unit.y - enemy.y) <= 1:
+                                                    # selected_unit.attack(enemy)
+                                                        # if enemy.health <= 0:
+                                                            # self.enemy_units.remove(enemy)
+                                    # action_1_selected = False
+                                    
+
+                        # elif event.key == pygame.K_2:
+                            # action_2_selected = True
+
+
+                        # Mettre fin au tour 
+                        elif event.key == pygame.K_RETURN:
                             has_acted = True
                             selected_unit.is_selected = False
-            
-        while selected_unit.is_selected is True:
-            selected_unit.draw_stats(self.screen)
-
 
     def handle_enemy_turn(self):
         """IA très simple pour les ennemis."""
@@ -305,11 +330,13 @@ class Game:
                 if target.health <= 0:
                     self.player_units.remove(target)
 
+    #### DESSIN DE L'ECRAN ####
     def flip_display(self):
     
         # Remplit l'écran en noir
         self.screen.fill(BLACK)
 
+        # Affiche les terrains
         for y in range(GRID_SIZE):
             for x in range(GRID_SIZE):
                 a = x * CELL_SIZE
@@ -320,6 +347,17 @@ class Game:
         for unit in self.player_units + self.enemy_units:
             unit.draw(self.screen)
 
+            if unit.is_selected:
+                unit.draw_stats(self.screen)
+            
+            # if action_1_selected:
+                # draw_range() # Mise en surbrillance pour la range de l'action 1
+                # draw_selection_range() # Carré rouge de déplacement de l'action 1
+
+            # if action_2_selected:
+                # draw_range() # Mise en surbrillance pour la range de l'action 2
+                # draw_selection_range() # Carré rouge de déplacement de l'action 2
+        
         # Rafraîchit l'affichage
         pygame.display.flip()
 

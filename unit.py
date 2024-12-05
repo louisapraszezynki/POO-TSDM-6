@@ -65,13 +65,13 @@ class Unit:
     attack_power = None
     unit_type = None # 'MAGE' ou 'CHEVALIER' ou 'ARCHER'
 
-
     def __init__(self, x, y, team):
         self.x = x
         self.y = y
         self.team = team  # 'player' ou 'enemy'
         self.is_selected = False
 
+# Dessins permanents
     def draw_health_bar(self, screen):
         """Dessine la barre de vie de l'unité."""
         # Position de la barre (au-dessus de l'unité)
@@ -90,6 +90,23 @@ class Unit:
         # Barre de vie (vert)
         pygame.draw.rect(screen, (0, 255, 0), (bar_x, bar_y, current_bar_width, bar_height))
 
+    def draw(self, screen):
+        """Affiche l'unité sur l'écran."""
+        gauche_de_case = self.x * CELL_SIZE + (CELL_SIZE - UNIT_CELL_SIZE) / 2
+        haut_de_case = self.y * CELL_SIZE + (CELL_SIZE - UNIT_CELL_SIZE) / 2
+
+        coordinates = Coordinates(gauche_de_case, haut_de_case, UNIT_CELL_SIZE, UNIT_CELL_SIZE)
+        display_character(screen, coordinates, self.unit_type, self.is_selected)
+
+        self.draw_health_bar(screen)
+
+# Dessins joueur par joueur
+    def draw_stats(self, screen):
+        action_string = f"Action possible 1 : {self.actions[0]}, Action possible 2 : {self.actions[1]}"
+        start_text_surface = font.render(action_string, False, WHITE)
+        screen.blit(start_text_surface, (MARGIN, HEIGHT - 100))
+
+# Actions
     def move(self, dx, dy, terrain_grid):
         # Déplace l'unité en tenant compte des restrictions du terrain
         new_x = self.x + dx
@@ -124,21 +141,8 @@ class Unit:
         if abs(self.x - target.x) <= 1 and abs(self.y - target.y) <= 1:
             target.health -= self.attack_power
 
-    def draw(self, screen):
-        """Affiche l'unité sur l'écran."""
-        gauche_de_case = self.x * CELL_SIZE + (CELL_SIZE - UNIT_CELL_SIZE) / 2
-        haut_de_case = self.y * CELL_SIZE + (CELL_SIZE - UNIT_CELL_SIZE) / 2
 
-        coordinates = Coordinates(gauche_de_case, haut_de_case, UNIT_CELL_SIZE, UNIT_CELL_SIZE)
-        display_character(screen, coordinates, self.unit_type, self.is_selected)
-
-        self.draw_health_bar(screen)
-
-    def draw_stats(self, screen):
-        action_string = f"Action possible 1 : {self.actions[0]}, Action possible 2 : {self.actions[1]}"
-        start_text_surface = font.render(action_string, False, WHITE)
-        screen.blit(start_text_surface, (MARGIN, HEIGHT - 100))
-
+# Sous classes des Unités
 class Mage(Unit):
     health = 100
     max_health = 100
