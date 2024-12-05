@@ -70,6 +70,8 @@ class Unit:
         self.y = y
         self.team = team  # 'player' ou 'enemy'
         self.is_selected = False
+        self.action_1_selected = False
+        self.action_2_selected = False
 
 # Dessins permanents
     def draw_health_bar(self, screen):
@@ -105,6 +107,19 @@ class Unit:
         action_string = f"Action possible 1 : {self.actions[0]}, Action possible 2 : {self.actions[1]}"
         start_text_surface = font.render(action_string, False, WHITE)
         screen.blit(start_text_surface, (MARGIN, HEIGHT - 100))
+    
+    def draw_selected_stat(self, screen):
+        if self.action_1_selected is True :
+            action_string = f"Action sélectionnée 1 : {self.actions[0]}"
+            start_text_surface = font.render(action_string, False, RED)
+            screen.blit(start_text_surface, (MARGIN, HEIGHT - 200))
+        
+        if self.action_2_selected is True:
+            action_string = f"Action possible 2 : {self.actions[1]}"
+            start_text_surface = font.render(action_string, False, RED)
+            screen.blit(start_text_surface, (MARGIN, HEIGHT - 200))
+
+
 
 # Actions
     def move(self, dx, dy, terrain_grid):

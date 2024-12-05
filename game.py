@@ -276,19 +276,20 @@ class Game:
                             self.flip_display()
 
                         # Choix de l'action 
-                        if event.key == pygame.K_1:
-                            action_1_selected = True
+                        if event.key == pygame.K_a:
+                            selected_unit.action_1_selected = True
+                            selected_unit.action_2_selected = False
 
-                            while action_1_selected:
+                            # while action_1_selected:
                                 # Touches directionnelles = déplacement du carré rouge dans la zone en surbrillance
-                                if event.key == pygame.K_LEFT:
-                                    sx = -1
-                                elif event.key == pygame.K_RIGHT:
-                                    sx = 1
-                                elif event.key == pygame.K_UP:
-                                    sy = -1
-                                elif event.key == pygame.K_DOWN:
-                                    sy = 1
+                                # if event.key == pygame.K_LEFT:
+                                #     sx = -1
+                                # elif event.key == pygame.K_RIGHT:
+                                #     sx = 1
+                                # elif event.key == pygame.K_UP:
+                                #     sy = -1
+                                # elif event.key == pygame.K_DOWN:
+                                #     sy = 1
 
                                 # elif event.key == pygame.K_SPACE:
                                     # get coordonnées de la cellule sélectionnée
@@ -305,14 +306,18 @@ class Game:
                                     # action_1_selected = False
                                     
 
-                        # elif event.key == pygame.K_2:
-                            # action_2_selected = True
+                        elif event.key == pygame.K_z:
+                            selected_unit.action_2_selected = True
+                            selected_unit.action_1_selected = False
 
 
                         # Mettre fin au tour 
                         elif event.key == pygame.K_RETURN:
                             has_acted = True
                             selected_unit.is_selected = False
+
+                        self.flip_display()
+
 
     def handle_enemy_turn(self):
         """IA très simple pour les ennemis."""
@@ -349,14 +354,17 @@ class Game:
 
             if unit.is_selected:
                 unit.draw_stats(self.screen)
+                print(unit.is_selected, unit.action_1_selected, unit.action_2_selected)
             
-            # if action_1_selected:
-                # draw_range() # Mise en surbrillance pour la range de l'action 1
-                # draw_selection_range() # Carré rouge de déplacement de l'action 1
+                if unit.action_1_selected:
+                    unit.draw_selected_stat(self.screen)
+                    # draw_range() # Mise en surbrillance pour la range de l'action 1
+                    # draw_selection_range() # Carré rouge de déplacement de l'action 1
 
-            # if action_2_selected:
-                # draw_range() # Mise en surbrillance pour la range de l'action 2
-                # draw_selection_range() # Carré rouge de déplacement de l'action 2
+                if unit.action_2_selected:
+                    unit.draw_selected_stat(self.screen)
+                    # draw_range() # Mise en surbrillance pour la range de l'action 2
+                    # draw_selection_range() # Carré rouge de déplacement de l'action 2
         
         # Rafraîchit l'affichage
         pygame.display.flip()
