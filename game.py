@@ -232,7 +232,6 @@ class Game:
 
     #### TOURS DE JEU ####
     def handle_player_turn(self):
-
         for selected_unit in self.player_units:
             movement = 0  # Compteur de mouvement
             player_movement_limit = selected_unit.speed  # Limite en fonction de la vitesse de l'unité
@@ -243,10 +242,8 @@ class Game:
             self.flip_display()
 
             while not has_acted:
-
                 # Important: cette boucle permet de gérer les événements Pygame
                 for event in pygame.event.get():
-
                     # Gestion de la fermeture de la fenêtre
                     if event.type == pygame.QUIT:
                         pygame.quit()
@@ -255,7 +252,6 @@ class Game:
                     # Gestion des touches du clavier
                     if event.type == pygame.KEYDOWN:
                         dx, dy = 0, 0
-                        sx, sy = 0, 0
 
                         # Déplacement (limité par la vitesse)
                         if movement < player_movement_limit:  # Vérification de la limite
@@ -271,47 +267,28 @@ class Game:
                             elif event.key == pygame.K_DOWN:
                                 dy = 1
                                 movement += 1
-                        
+
                             selected_unit.move(dx, dy, self.terrain_grid)
                             self.flip_display()
 
-                        # Choix de l'action 
+                        # Choix de l'action
                         if event.key == pygame.K_a:
                             selected_unit.action_1_selected = True
                             selected_unit.action_2_selected = False
-
-                            # while action_1_selected:
-                                # Touches directionnelles = déplacement du carré rouge dans la zone en surbrillance
-                                # if event.key == pygame.K_LEFT:
-                                #     sx = -1
-                                # elif event.key == pygame.K_RIGHT:
-                                #     sx = 1
-                                # elif event.key == pygame.K_UP:
-                                #     sy = -1
-                                # elif event.key == pygame.K_DOWN:
-                                #     sy = 1
-
-                                # elif event.key == pygame.K_SPACE:
-                                    # get coordonnées de la cellule sélectionnée
-                                    # if (abs(dx) + abs(dy)) de la cellule sélectionnée < range: 
-                                    # unit de coordonnées de la cellule sélectionnée = target
-                                    # do selected_action sur target
-                                        # Attaque (touche espace)
-                                        # if event.key == pygame.K_SPACE:
-                                            # for enemy in self.enemy_units:
-                                                # if abs(selected_unit.x - enemy.x) <= 1 and abs(selected_unit.y - enemy.y) <= 1:
-                                                    # selected_unit.attack(enemy)
-                                                        # if enemy.health <= 0:
-                                                            # self.enemy_units.remove(enemy)
-                                    # action_1_selected = False
-                                    
+                            self.draw_range(selected_unit,
+                                            selected_unit.skills[0].range)  # Affiche la portée de la première action
+                            pygame.display.flip()  # Rafraîchit l'écran
+                            self.flip_display()
 
                         elif event.key == pygame.K_z:
                             selected_unit.action_2_selected = True
                             selected_unit.action_1_selected = False
+                            self.draw_range(selected_unit,
+                                            selected_unit.skills[1].range)  # Affiche la portée de la deuxième action
+                            pygame.display.flip()  # Rafraîchit l'écran
+                            self.flip_display()
 
-
-                        # Mettre fin au tour 
+                        # Mettre fin au tour
                         elif event.key == pygame.K_RETURN:
                             has_acted = True
                             selected_unit.is_selected = False
@@ -335,9 +312,16 @@ class Game:
                 if target.health <= 0:
                     self.player_units.remove(target)
 
+    def draw_range(self, unit, action_range):
+        """Dessine les cases accessibles pour une unité donnée."""
+        accessible_cells = unit.get_action_range(action_range)
+        for x, y in accessible_cells:
+            rect = pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+            pygame.draw.rect(self.screen, BLUE, rect, 2)  # Bordure bleue pour indiquer la portée
+
     #### DESSIN DE L'ECRAN ####
+
     def flip_display(self):
-    
         # Remplit l'écran en noir
         self.screen.fill(BLACK)
 
@@ -355,17 +339,15 @@ class Game:
             if unit.is_selected:
                 unit.draw_stats(self.screen)
                 print(unit.is_selected, unit.action_1_selected, unit.action_2_selected)
-            
+
                 if unit.action_1_selected:
                     unit.draw_selected_stat(self.screen)
-                    # draw_range() # Mise en surbrillance pour la range de l'action 1
-                    # draw_selection_range() # Carré rouge de déplacement de l'action 1
+                    self.draw_range(unit, unit.skills[0].range)  # Affiche la portée de l'action 1
 
                 if unit.action_2_selected:
                     unit.draw_selected_stat(self.screen)
-                    # draw_range() # Mise en surbrillance pour la range de l'action 2
-                    # draw_selection_range() # Carré rouge de déplacement de l'action 2
-        
+                    self.draw_range(unit, unit.skills[1].range)  # Affiche la portée de l'action 2
+
         # Rafraîchit l'affichage
         pygame.display.flip()
 

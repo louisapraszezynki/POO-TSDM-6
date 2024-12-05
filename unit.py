@@ -156,6 +156,17 @@ class Unit:
         if abs(self.x - target.x) <= 1 and abs(self.y - target.y) <= 1:
             target.health -= self.attack_power
 
+    def get_action_range(self, action_range):
+        """Retourne les coordonnées accessibles en fonction de la portée."""
+        accessible_cells = []
+        for dx in range(-action_range, action_range + 1):
+            for dy in range(-action_range, action_range + 1):
+                if abs(dx) + abs(dy) <= action_range:  # Portée en Manhattan
+                    x, y = self.x + dx, self.y + dy
+                    if 0 <= x < GRID_SIZE and 0 <= y < GRID_SIZE:  # Vérifie les limites de la grille
+                        accessible_cells.append((x, y))
+        return accessible_cells
+
 
 # Sous classes des Unités
 class Mage(Unit):
