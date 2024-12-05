@@ -69,10 +69,10 @@ class Game:
         
         # terrain types: plain, water, fire, wall
         self.terrain_grid = [
-            ["plain", "plain", "water", "plain", "plain", "fire", "plain", "wall"],
-            ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"],
-            ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"],
-            ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"],
+            ["water", "water", "water", "plain", "plain", "plain", "wall", "wall"],
+            ["water", "water", "plain", "plain", "fire", "fire", "fire", "wall"],
+            ["water", "plain", "plain", "plain", "fire", "water", "wall", "plain"],
+            ["plain", "plain", "wall", "plain", "plain", "fire", "plain", "plain"],
             ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"],
             ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"],
             ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"],
@@ -364,6 +364,10 @@ def main():
 
     # Instanciation du jeu
     game = Game(screen)
+
+    # Lancement de la musique
+    pygame.mixer.music.load("music\Astrub.mp3")
+    pygame.mixer.music.play(-1)
 
     # Avant de passer à la boucle principale du jeu, on passe par le menu démarrer
     game_ready_to_start = False
