@@ -71,12 +71,12 @@ class Game:
         self.terrain_grid = [
             ["water", "water", "water", "plain", "plain", "plain", "wall", "wall"],
             ["water", "water", "plain", "plain", "fire", "fire", "fire", "wall"],
-            ["water", "plain", "plain", "plain", "fire", "water", "wall", "plain"],
-            ["plain", "plain", "wall", "plain", "plain", "fire", "plain", "plain"],
-            ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"],
-            ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"],
-            ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"],
-            ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"]
+            ["water", "plain", "plain", "plain", "fire", "fire", "wall", "plain"],
+            ["water", "plain", "plain", "plain", "plain", "fire", "plain", "plain"],
+            ["plain", "water", "water", "water", "plain", "plain", "plain", "plain"],
+            ["plain", "wall", "wall", "water", "plain", "plain", "plain", "wall"],
+            ["wall", "wall", "plain", "plain", "plain", "plain", "plain", "wall"],
+            ["wall", "wall", "plain", "plain", "plain", "plain", "wall", "wall"]
         ]
 
 
@@ -98,15 +98,15 @@ class Game:
         # }
 
         self.player_units = [
-            UNIT_CLASSES[UNIT_TYPES[self.unit_types[0]]](0, 0, 'player'),
-            UNIT_CLASSES[UNIT_TYPES[self.unit_types[1]]](1, 0, 'player'),
-            UNIT_CLASSES[UNIT_TYPES[self.unit_types[2]]](2, 0, 'player'),
+            UNIT_CLASSES[UNIT_TYPES[self.unit_types[0]]](3, 0, 'player'),
+            UNIT_CLASSES[UNIT_TYPES[self.unit_types[1]]](2, 1, 'player'),
+            UNIT_CLASSES[UNIT_TYPES[self.unit_types[2]]](1, 2, 'player'),
         ]
 
         self.enemy_units = [
-            UNIT_CLASSES[UNIT_TYPES[self.unit_types[3]]](6, 6, 'player'),
-            UNIT_CLASSES[UNIT_TYPES[self.unit_types[4]]](7, 6, 'player'),
-            UNIT_CLASSES[UNIT_TYPES[self.unit_types[5]]](5, 6, 'player'),
+            UNIT_CLASSES[UNIT_TYPES[self.unit_types[3]]](6, 5, 'player'),
+            UNIT_CLASSES[UNIT_TYPES[self.unit_types[4]]](6, 6, 'player'),
+            UNIT_CLASSES[UNIT_TYPES[self.unit_types[5]]](5, 7, 'player'),
         ]
 
 
@@ -338,7 +338,6 @@ class Game:
 
             if unit.is_selected:
                 unit.draw_stats(self.screen)
-                print(unit.is_selected, unit.action_1_selected, unit.action_2_selected)
 
                 if unit.action_1_selected:
                     unit.draw_selected_stat(self.screen)
