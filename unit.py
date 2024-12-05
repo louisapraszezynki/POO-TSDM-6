@@ -178,7 +178,7 @@ class Mage(Unit):
     unit_type = 'MAGE'
     actions = ['Spell', 'Regen']
     skills = [
-        Spell('spell', 4, 3, 3), # attack_type, range, power, area_of_effect
+        Spell('spell', 4, 0.5, 3), # attack_type, range, power, area_of_effect
         Regen('regen', 3, 7, 3) # attack_type, range, power, area_of_effect
     ]
 
@@ -192,7 +192,7 @@ class Chevalier(Unit):
     unit_type = 'CHEVALIER'
     actions = ['Weapon', 'Regen']
     skills = [
-        Weapon('weapon', 1, 1, 1), # attack_type, range, power, area_of_effect
+        Weapon('weapon', 1, 0.1, 1), # attack_type, range, power, area_of_effect
         Regen('regen', 1, 3, 1) # attack_type, range, power, area_of_effect
     ]
 
@@ -206,7 +206,7 @@ class Archer(Unit):
     unit_type = 'ARCHER'
     actions = ['Weapon', 'Regen']
     skills = [
-        Weapon('weapon', 6, 1, 2), # attack_type, range, power, area_of_effect
+        Weapon('weapon', 6, 0.2, 2), # attack_type, range, power, area_of_effect
         Regen('regen', 1, 2, 1) # attack_type, range, power, area_of_effect
     ]
 
