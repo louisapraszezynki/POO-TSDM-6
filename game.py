@@ -81,6 +81,8 @@ class Game:
         # en appuyant sur la fleche droite
         self.unit_types = [0, 0, 0, 0, 0, 0]
 
+        self.selected_attack_position = [1, 1]
+
     def init_units(self):
         # self.unit_types
         # [0, 0, 0, 0, 0, 0]
@@ -252,42 +254,58 @@ class Game:
                         # Déplacement (limité par la vitesse)
                         if movement < player_movement_limit:  # Vérification de la limite
                             if event.key == pygame.K_LEFT:
-                                dx = -1
-                                movement += 1
+                                if (current_x - 1, current_y) in accessible_cells:
+                                    self.selected_attack_position[0] -= 1
                             elif event.key == pygame.K_RIGHT:
-                                dx = 1
-                                movement += 1
+                                if (current_x + 1, current_y) in accessible_cells:
+                                    self.selected_attack_position[0] += 1
                             elif event.key == pygame.K_UP:
-                                dy = -1
-                                movement += 1
+                                if (current_x, current_y - 1) in accessible_cells:
+                                    self.selected_attack_position[1] -= 1
                             elif event.key == pygame.K_DOWN:
-                                dy = 1
-                                movement += 1
-
-                            selected_unit.move(dx, dy, self.terrain_grid)
-                            self.flip_display()
+                                if (current_x, current_y + 1) in accessible_cells:
+                                    self.selected_attack_position[1] += 1
 
                         # Choix de l'action
                         if event.key == pygame.K_a:
-                            selected_unit.action_1_selected = True
-                            selected_unit.action_2_selected = False
-                            self.draw_range(selected_unit,
-                                            selected_unit.skills[0].range)  # Affiche la portée de la première action
-                            pygame.display.flip()  # Rafraîchit l'écran
-                            self.flip_display()
+                            if selected_unit.action_1_selected is True:
+                                selected_unit.action_1_selected = False
+                            else:
+                                selected_unit.action_1_selected = True
+                                selected_unit.action_2_selected = False
+                            self.selected_attack_position = [0, 0]
 
                         elif event.key == pygame.K_z:
-                            selected_unit.action_2_selected = True
-                            selected_unit.action_1_selected = False
-                            self.draw_range(selected_unit,
-                                            selected_unit.skills[1].range)  # Affiche la portée de la deuxième action
-                            pygame.display.flip()  # Rafraîchit l'écran
-                            self.flip_display()
+                            if selected_unit.action_2_selected is True:
+                                selected_unit.action_2_selected = False
+                            else:
+                                selected_unit.action_2_selected = True
+                                selected_unit.action_1_selected = False
+                            self.selected_attack_position = [0, 0]
 
+                        elif event.key == pygame.K_SPACE:
+                            current_x = selected_unit.x + self.selected_attack_position[0]
+                            current_y = selected_unit.y + self.selected_attack_position[1]
+
+                            target = self.target_unit(current_x, current_y)
+
+                            if target is not None:
+                                if selected_unit.action_1_selected:
+                                    selected_unit.attack(selected_unit.skills[0], target)
+                                elif selected_unit.action_2_selected:
+                                    selected_unit.attack(selected_unit.skills[1], target)
+                                
+                                self.dead_or_alive()
+
+                                if not self.player_units or not self.enemy_units:
+                                    return
+                            
                         # Mettre fin au tour
                         elif event.key == pygame.K_RETURN:
                             has_acted = True
                             selected_unit.is_selected = False
+                            selected_unit.already_attacked = False
+                            selected_unit.movement_this_turn = 0  # Compteur de mouvement
 
                         self.flip_display()
 
@@ -300,13 +318,21 @@ class Game:
             target = random.choice(self.player_units)
             dx = 1 if enemy.x < target.x else -1 if enemy.x > target.x else 0
             dy = 1 if enemy.y < target.y else -1 if enemy.y > target.y else 0
-            enemy.move(dx, dy , self.terrain_grid)
+            enemy.move(dx, dy , self.terrain_grid, self.get_unit_positions())
+
+            viable_attacks = [skill for skill in enemy.skills if skill.attack_type != 'regen']
 
             # Attaque si possible
             if abs(enemy.x - target.x) <= 1 and abs(enemy.y - target.y) <= 1:
-                enemy.attack(target)
+                enemy.attack(random.choice(viable_attacks), target)
                 if target.health <= 0:
                     self.player_units.remove(target)
+
+                if not self.player_units or not self.enemy_units:
+                    return
+            
+            enemy.already_attacked = False
+
 
     def draw_range(self, unit, action_range):
         """Dessine les cases accessibles pour une unité donnée."""

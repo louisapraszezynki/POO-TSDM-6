@@ -177,10 +177,35 @@ class Unit:
             self.x = new_x
             self.y = new_y
 
-    def attack(self, target):
+        return True
+
+    def attack(self, skill, target):
         """Attaque une unité cible."""
-        if abs(self.x - target.x) <= 1 and abs(self.y - target.y) <= 1:
-            target.health -= self.attack_power
+
+        if self.already_attacked:
+            return
+
+        # Correspond aux stats dans Dofousse
+        attack_power = self.attack_power
+
+        # Correspond a la plage de degats de base du sort
+        skill_power = skill.power 
+
+        attack = skill_power + skill_power * (attack_power / 100)
+
+        # Degats qu'on enleve des degats finaux = on se protege
+        resistances = target.resistance
+
+        total_attack = attack - resistances
+
+        target.health -= total_attack
+
+        # Pour pas que les unit aient plus de 100% de leur vie
+        if target.health > target.max_health:
+            target.health = target.max_health
+
+        self.already_attacked = True
+
 
     def get_action_range(self, action_range):
         """Retourne les coordonnées accessibles en fonction de la portée."""
@@ -198,27 +223,27 @@ class Unit:
 class Mage(Unit):
     health = 100
     max_health = 100
-    attack_power = 10
+    attack_power = 100
     resistance = 4
     speed = 4
     unit_type = 'MAGE'
     actions = ['Spell', 'Regen']
     skills = [
-        Spell('spell', 4, 0.5, 3), # attack_type, range, power, area_of_effect
-        Regen('regen', 3, 7, 3) # attack_type, range, power, area_of_effect
+        Spell('spell', 4, 10, 3), # attack_type, range, power, area_of_effect
+        Regen('regen', 3, -7, 3) # attack_type, range, power, area_of_effect
     ]
 
 
 class Chevalier(Unit):
     health = 120
     max_health = 120
-    attack_power = 12
+    attack_power = 120
     resistance = 7
     speed = 5
     unit_type = 'CHEVALIER'
     actions = ['Weapon', 'Regen']
     skills = [
-        Weapon('weapon', 1, 0.1, 1), # attack_type, range, power, area_of_effect
+        Weapon('weapon', 1, 15, 1), # attack_type, range, power, area_of_effect
         Regen('regen', 1, 3, 1) # attack_type, range, power, area_of_effect
     ]
 
@@ -226,13 +251,13 @@ class Chevalier(Unit):
 class Archer(Unit):
     health = 100
     max_health = 100
-    attack_power = 11
+    attack_power = 80
     resistance = 12
     speed = 3
     unit_type = 'ARCHER'
     actions = ['Weapon', 'Regen']
     skills = [
-        Weapon('weapon', 6, 0.2, 2), # attack_type, range, power, area_of_effect
+        Weapon('weapon', 6, 6, 2), # attack_type, range, power, area_of_effect
         Regen('regen', 1, 2, 1) # attack_type, range, power, area_of_effect
     ]
 
