@@ -9,7 +9,6 @@ def display_character_in_menu(
     coordinates,
     class_type,
     selected: bool,
-    in_menu: bool = False
 ):
     # Si le personnage actuellement en train d'être selectionné est celui-ci, alors on fait un carré blanc
     # un peu plus large derrière pour le distinguer
@@ -51,6 +50,8 @@ class Weapon(Skills):
 
 class Regen(Skills):
     def __init__(self, attack_type, range, power, area_of_effect):
+        # La Regen utilise un power négatif
+        # Un type avec des grosses résis se fera plus heal
         super().__init__(attack_type, range, power, area_of_effect)
         self.attack_type = 'regen'
 
@@ -148,7 +149,13 @@ class Unit:
 
 
 # Actions
-    def move(self, dx, dy, terrain_grid):
+    def move(self, dx, dy, terrain_grid, unit_positions):
+
+        # Si l'unité ne se déplace pas, on return tout de suite pour ne pas subi de malus additionnels
+        print(dx, dy)
+        if dx == 0 and dy == 0:
+            return False
+
         # Déplace l'unité en tenant compte des restrictions du terrain
         new_x = self.x + dx
         new_y = self.y + dy
@@ -158,8 +165,8 @@ class Unit:
             terrain_type = terrain_grid[new_y][new_x]
 
             # Bloquez le déplacement sur un mur
-            if terrain_type == "wall":
-                return
+            if terrain_type == "wall" or (new_x, new_y) in unit_positions:
+                return False
 
             # Le feu inflige des dégâts
             if terrain_type == "fire":
@@ -169,8 +176,6 @@ class Unit:
             if terrain_type == "water":
                 if self.speed > 0:
                     self.speed -= 1
-                else:
-                    return 
 
 
             # Déplacez l'unité si le terrain est accessible

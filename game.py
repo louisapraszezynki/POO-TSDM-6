@@ -231,8 +231,6 @@ class Game:
     #### TOURS DE JEU ####
     def handle_player_turn(self):
         for selected_unit in self.player_units:
-            movement = 0  # Compteur de mouvement
-            player_movement_limit = selected_unit.speed  # Limite en fonction de la vitesse de l'unité
 
             # Tant que l'unité n'a pas terminé son tour
             has_acted = False
@@ -252,7 +250,40 @@ class Game:
                         dx, dy = 0, 0
 
                         # Déplacement (limité par la vitesse)
-                        if movement < player_movement_limit:  # Vérification de la limite
+                        if selected_unit.action_1_selected is False and selected_unit.action_2_selected is False:
+                            if selected_unit.movement_this_turn < selected_unit.speed:  # Vérification de la limite
+                                if event.key == pygame.K_LEFT:
+                                    dx = -1
+                                elif event.key == pygame.K_RIGHT:
+                                    dx = 1
+                                elif event.key == pygame.K_UP:
+                                    dy = -1
+                                elif event.key == pygame.K_DOWN:
+                                    dy = 1
+
+                                unit_has_moved = selected_unit.move(dx, dy, self.terrain_grid, self.get_unit_positions())
+                                print(unit_has_moved)
+
+                                if unit_has_moved:
+                                    selected_unit.movement_this_turn += 1
+
+                            self.dead_or_alive()
+
+                            if not self.player_units or not self.enemy_units:
+                                return
+
+                            # self.flip_display()
+                        else:
+                            if selected_unit.action_1_selected:
+                                range = selected_unit.skills[0].range
+                            elif selected_unit.action_2_selected:
+                                range = selected_unit.skills[1].range
+
+                            accessible_cells = selected_unit.get_action_range(range)
+
+                            current_x = selected_unit.x + self.selected_attack_position[0]
+                            current_y = selected_unit.y + self.selected_attack_position[1]
+
                             if event.key == pygame.K_LEFT:
                                 if (current_x - 1, current_y) in accessible_cells:
                                     self.selected_attack_position[0] -= 1
@@ -309,6 +340,53 @@ class Game:
 
                         self.flip_display()
 
+    def show_results(self, result):
+        self.screen.fill(BLACK) # Remplit l'écran en noir
+
+        exit_text_surface = menu_font.render(result, False, WHITE)
+        self.screen.blit(exit_text_surface, (WIDTH / 2 - 100 + 5, HEIGHT / 2 - 120))
+        pygame.draw.rect(self.screen, WHITE, (WIDTH / 2 - 130, HEIGHT / 2 - 120, 260, 50), 1)
+
+        # On boucle à travers les événements PyGame
+        for event in pygame.event.get():
+
+            # Si on appuie sur la croix, alors le jeu doit se fermer
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            
+            pygame.display.flip()
+
+
+    def dead_or_alive(self):
+        # Regarde si des joueurs sont morts et les supprime de leur équipe respective
+        for player in self.player_units:
+            if player.health <= 0:
+                self.player_units.remove(player)
+
+        for enemy in self.enemy_units:
+            if enemy.health <= 0:
+                self.enemy_units.remove(enemy)
+
+    def get_unit_positions(self):
+        # Renvoie une liste de toutes les positions actuellement occupées par une entité
+        unit_positions = []
+        for player in self.player_units:
+            unit_positions.append((player.x, player.y))
+        for enemy in self.enemy_units:
+            unit_positions.append((enemy.x, enemy.y))
+        return unit_positions
+
+    def target_unit(self, x, y):
+        print(x, y)
+        for player in self.player_units:
+            print(player.x, player.y)
+            if player.x == x and player.y == y:
+                return player
+            
+        for enemy in self.enemy_units:
+            if enemy.x == x and enemy.y == y:
+                return enemy
 
     def handle_enemy_turn(self):
         """IA très simple pour les ennemis."""
@@ -431,9 +509,15 @@ def main():
     game.init_units()
 
     # Boucle principale du jeu
-    while True:
+    while game.player_units and game.enemy_units :
         game.handle_player_turn()
         game.handle_enemy_turn()
+
+
+    result = "You have lost" if not game.player_units else "You have won"
+
+    while True:
+        game_results = game.show_results(result)
 
 if __name__ == "__main__":
     main()
