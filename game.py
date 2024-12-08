@@ -3,6 +3,7 @@ import random
 
 from unit import *
 from utilitaires import *
+from objects import *
 
 
 class Game:
@@ -36,6 +37,8 @@ class Game:
         self.unit_types = [0, 0, 0, 0, 0, 0]
 
         self.selected_attack_position = [1, 1]
+
+        self.objects = [Apple(6, 3), Apple(3, 3), Chicken(7, 2), Chicken(3, 6), Apple(5, 0)]
 
     #### INITIALISATION EQUIPES ####
     def init_units(self):
@@ -209,13 +212,16 @@ class Game:
 
                                 if unit_has_moved:
                                     selected_unit.movement_this_turn += 1
+                                    for object in self.objects:
+                                        if (selected_unit.x, selected_unit.y) == (object.x, object.y):
+                                            selected_unit.health += object.health
+                                            object.is_used = True
 
                             self.dead_or_alive()
 
                             if not self.player_units or not self.enemy_units:
                                 return
 
-                            # self.flip_display()
                         else:
                             if selected_unit.action_1_selected:
                                 range = selected_unit.skills[0].range
@@ -284,7 +290,6 @@ class Game:
                         self.flip_display()
 
     def handle_enemy_turn(self):
-        """IA très simple pour les ennemis."""
         for enemy in self.enemy_units:
 
             # Déplacement aléatoire
@@ -293,11 +298,20 @@ class Game:
             dy = 1 if enemy.y < target.y else -1 if enemy.y > target.y else 0
             enemy.move(dx, dy , self.terrain_grid, self.get_unit_positions())
 
+            for object in self.objects:
+                if (enemy.x, enemy.y) == (object.x, object.y):
+                    enemy.health += object.health
+                    object.is_used = True
+
             viable_attacks = [skill for skill in enemy.skills if skill.attack_type != 'regen']
 
             # Attaque si possible
-            if abs(enemy.x - target.x) <= 1 and abs(enemy.y - target.y) <= 1:
-                enemy.attack(random.choice(viable_attacks), target)
+            enemy_attack = random.choice(viable_attacks)
+            range = enemy_attack.range
+
+            if abs((enemy.x - target.x) + (enemy.y - target.y)) <= range:
+                enemy.attack(enemy_attack, target)
+
                 if target.health <= 0:
                     self.player_units.remove(target)
 
@@ -371,6 +385,12 @@ class Game:
                 a = x * CELL_SIZE
                 b = y * CELL_SIZE
                 self.screen.blit(TERRAIN_TYPES[self.terrain_grid[y][x]], (a, b))
+        
+        # Affiche les objets s'ils ne sont pas utilisés
+        for object in self.objects:
+            if not object.is_used:
+                self.screen.blit(OBJECTS_IMAGES[object.type], (CELL_SIZE * object.x + CELL_SIZE/4 , CELL_SIZE * object.y + CELL_SIZE/4))
+                self.screen.blit(OBJECTS_IMAGES[object.type], (CELL_SIZE * object.x + CELL_SIZE/4 , CELL_SIZE * object.y + CELL_SIZE/4))
 
         # Affiche les unités sur la grille
         for unit in self.player_units + self.enemy_units:

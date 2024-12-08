@@ -106,6 +106,17 @@ UNIT_IMAGES = {
     ),
 }
 
+OBJECTS_IMAGES = {
+    "apple": pygame.transform.scale(
+        pygame.image.load("images/apple.png"),
+        (UNIT_CELL_SIZE/1.5, UNIT_CELL_SIZE/1.5)
+    ),
+
+    "chicken": pygame.transform.scale(
+    pygame.image.load("images/chicken.png"),
+    (UNIT_CELL_SIZE/1.5, UNIT_CELL_SIZE/1.5)
+    )
+}
 
 ##################################### CONSTANTES DU MENU START EXIT #####################################
 MENU_ITEM_WIDTH = 150
