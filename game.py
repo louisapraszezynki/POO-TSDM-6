@@ -484,6 +484,7 @@ def main():
     game = Game(screen)
 
     # Lancement de la musique
+    pygame.mixer.init()
     pygame.mixer.music.load("music\Astrub.mp3")
     pygame.mixer.music.play(-1)
 
@@ -505,7 +506,18 @@ def main():
         game.handle_enemy_turn()
 
 
-    result = "You have lost :(" if not game.player_units else "You have won :)"
+    result = "You have lost" if not game.player_units else "You have won"
+
+    if result == "You have lost":
+        print(result)
+        pygame.mixer.music.stop()
+        pygame.mixer.music.load("music\lose_music.mp3")
+        pygame.mixer.music.play(-1)
+
+    elif result == "You have won":
+        pygame.mixer.music.stop()
+        pygame.mixer.music.load("music\win_music.mp3")
+        pygame.mixer.music.play(-1)
 
     while True:
         game_results = game.show_results(result)
