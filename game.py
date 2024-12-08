@@ -84,27 +84,17 @@ class Game:
         self.selected_attack_position = [1, 1]
 
     def init_units(self):
-        # self.unit_types
-        # [0, 0, 0, 0, 0, 0]
-
-        # UNIT_TYPES = ["MAGE", "ARCHER", "CHEVALIER"]
-
-        # UNIT_CLASSES = {
-        #     'MAGE': Mage,
-        #     'CHEVALIER': Chevalier,
-        #     'ARCHER': Archer,
-        # }
 
         self.player_units = [
-            UNIT_CLASSES[UNIT_TYPES[self.unit_types[0]]](3, 0, 'player'),
-            UNIT_CLASSES[UNIT_TYPES[self.unit_types[1]]](2, 1, 'player'),
-            UNIT_CLASSES[UNIT_TYPES[self.unit_types[2]]](1, 2, 'player'),
+            UNIT_CLASSES[UNIT_TYPES[self.unit_types[0]]](3, 0, 'player', 0),
+            UNIT_CLASSES[UNIT_TYPES[self.unit_types[1]]](2, 1, 'player', 1),
+            UNIT_CLASSES[UNIT_TYPES[self.unit_types[2]]](1, 2, 'player', 2),
         ]
 
         self.enemy_units = [
-            UNIT_CLASSES[UNIT_TYPES[self.unit_types[3]]](6, 5, 'enemy'),
-            UNIT_CLASSES[UNIT_TYPES[self.unit_types[4]]](6, 6, 'enemy'),
-            UNIT_CLASSES[UNIT_TYPES[self.unit_types[5]]](5, 7, 'enemy'),
+            UNIT_CLASSES[UNIT_TYPES[self.unit_types[3]]](6, 5, 'enemy', 3),
+            UNIT_CLASSES[UNIT_TYPES[self.unit_types[4]]](6, 6, 'enemy', 4),
+            UNIT_CLASSES[UNIT_TYPES[self.unit_types[5]]](5, 7, 'enemy', 5),
         ]
 
 
@@ -262,7 +252,6 @@ class Game:
                                     dy = 1
 
                                 unit_has_moved = selected_unit.move(dx, dy, self.terrain_grid, self.get_unit_positions())
-                                print(unit_has_moved)
 
                                 if unit_has_moved:
                                     selected_unit.movement_this_turn += 1
@@ -378,9 +367,7 @@ class Game:
         return unit_positions
 
     def target_unit(self, x, y):
-        print(x, y)
         for player in self.player_units:
-            print(player.x, player.y)
             if player.x == x and player.y == y:
                 return player
             
@@ -411,7 +398,6 @@ class Game:
             
             enemy.already_attacked = False
 
-
     def draw_range(self, unit, action_range):
         """Dessine les cases accessibles pour une unité donnée."""
         accessible_cells = unit.get_action_range(action_range)
@@ -420,7 +406,6 @@ class Game:
             pygame.draw.rect(self.screen, BLUE, rect, 2)  # Bordure bleue pour indiquer la portée de l'action
 
     #### DESSIN DE L'ECRAN ####
-
     def flip_display(self):
         # Remplit l'écran en noir
         self.screen.fill(BLACK)
@@ -435,6 +420,7 @@ class Game:
         # Affiche les unités sur la grille
         for unit in self.player_units + self.enemy_units:
             unit.draw(self.screen)
+
 
             if unit.is_selected:
                 unit.draw_stats(self.screen)

@@ -65,7 +65,7 @@ class Unit:
     attack_power = None
     unit_type = None # 'MAGE' ou 'CHEVALIER' ou 'ARCHER'
 
-    def __init__(self, x, y, team):
+    def __init__(self, x, y, team, position):
         self.x = x
         self.y = y
         self.team = team  # 'player' ou 'enemy'
@@ -74,8 +74,9 @@ class Unit:
         self.action_2_selected = False
         self.already_attacked = False
         self.movement_this_turn = 0
+        self.position = position
 
-    # Affichage des types d'unités dans le menu de sélection des personnages
+    # Affichage des types d'unités sur la map
     def display_character_on_map(
         self,
         screen,
@@ -96,16 +97,15 @@ class Unit:
             )
 
             movement_left = max(0, self.speed - self.movement_this_turn)
-            full_string = f"Health: {self.health}, Attack power: {self.attack_power}, Movement left: {movement_left}"
+            full_string = f"Health: {self.health}    Attack power: {self.attack_power}    Movement left: {movement_left}"
 
             start_text_surface = grid_font.render(full_string, False, WHITE)
-            screen.blit(start_text_surface, (MARGIN, HEIGHT - 50))
+            screen.blit(start_text_surface, (MARGIN, HEIGHT - 40))
 
         screen.blit(UNIT_IMAGES[self.unit_type], (gauche_de_case, haut_de_case))
 
 # Dessins permanents
     def draw_health_bar(self, screen):
-        """Dessine la barre de vie de l'unité."""
         # Position de la barre (au-dessus de l'unité)
         bar_width = CELL_SIZE - 10
         bar_height = 5
@@ -125,27 +125,45 @@ class Unit:
         # Barre de vie (vert)
         pygame.draw.rect(screen, GREEN, (bar_x, bar_y, current_bar_width, bar_height))
 
+    def display_teams(self,
+        screen,
+        position,
+        selected: bool
+    ):
+        
+        largeur = WIDTH - (CELL_SIZE - 5)
+        hauteur = (CELL_SIZE * position) + 10
+
+        screen.blit(UNIT_IMAGES[self.unit_type], (largeur , hauteur))
+        if selected:
+            pygame.draw.rect(
+                screen, 
+                BLUE, 
+                (largeur - 2, hauteur - 2, UNIT_CELL_SIZE + 4, UNIT_CELL_SIZE + 4), 
+                width=3
+            )
+
     def draw(self, screen):
-        """Affiche l'unité sur l'écran."""
         self.display_character_on_map(screen, self.is_selected)
         self.draw_health_bar(screen)
+        self.display_teams(screen, self.position, self.is_selected)
 
 # Dessins joueur par joueur
     def draw_stats(self, screen):
-        action_string = f"Action possible 1 : {self.actions[0]}, Action possible 2 : {self.actions[1]}"
+        action_string = f"Action 1 (A): {self.actions[0]}      Action 2 (Z): {self.actions[1]}"
         start_text_surface = grid_font.render(action_string, False, WHITE)
-        screen.blit(start_text_surface, (MARGIN, HEIGHT - 100))
+        screen.blit(start_text_surface, (MARGIN, HEIGHT - 90))
     
     def draw_selected_stat(self, screen):
         if self.action_1_selected is True :
-            action_string = f"Action sélectionnée : {self.actions[0]}"
+            action_string = f"Selected action : {self.actions[0]}"
             start_text_surface = grid_font.render(action_string, False, BLUE)
-            screen.blit(start_text_surface, (MARGIN, HEIGHT - 75))
+            screen.blit(start_text_surface, (MARGIN, HEIGHT - 65))
         
         if self.action_2_selected is True:
-            action_string = f"Action sélectionnée : {self.actions[1]}"
+            action_string = f"Selected action : {self.actions[1]}"
             start_text_surface = grid_font.render(action_string, False, BLUE)
-            screen.blit(start_text_surface, (MARGIN, HEIGHT - 75))
+            screen.blit(start_text_surface, (MARGIN, HEIGHT - 65))
 
 
 
@@ -153,7 +171,6 @@ class Unit:
     def move(self, dx, dy, terrain_grid, unit_positions):
 
         # Si l'unité ne se déplace pas, on return tout de suite pour ne pas subi de malus additionnels
-        print(dx, dy)
         if dx == 0 and dy == 0:
             return False
 
@@ -186,7 +203,6 @@ class Unit:
         return True
 
     def attack(self, skill, target):
-        """Attaque une unité cible."""
 
         if self.already_attacked:
             return
@@ -214,7 +230,7 @@ class Unit:
 
 
     def get_action_range(self, action_range):
-        """Retourne les coordonnées accessibles en fonction de la portée."""
+        # Retourne les coordonnées accessibles en fonction de la portée
         accessible_cells = []
         for dx in range(-action_range, action_range + 1):
             for dy in range(-action_range, action_range + 1):
