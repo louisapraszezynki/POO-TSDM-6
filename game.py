@@ -52,12 +52,9 @@ PLAYER_1_MENU_COORDINATES = [Coordinates(
 
 
 class Game:
-
     def __init__(self, screen):
- 
         self.player_units = []
         self.enemy_units = []
-
         self.screen = screen
 
         # On déclare que l'état initial du menu sera d'être sur "START".
@@ -78,7 +75,6 @@ class Game:
             ["wall", "wall", "plain", "plain", "plain", "plain", "plain", "wall"],
             ["wall", "wall", "plain", "plain", "plain", "plain", "wall", "wall"]
         ]
-
 
         # Initialisation des unit types affichés dans le menu personnages
         # On veut mettre à jour cette liste pour que ça se change de manière dynamique
@@ -104,9 +100,9 @@ class Game:
         ]
 
         self.enemy_units = [
-            UNIT_CLASSES[UNIT_TYPES[self.unit_types[3]]](6, 5, 'player'),
-            UNIT_CLASSES[UNIT_TYPES[self.unit_types[4]]](6, 6, 'player'),
-            UNIT_CLASSES[UNIT_TYPES[self.unit_types[5]]](5, 7, 'player'),
+            UNIT_CLASSES[UNIT_TYPES[self.unit_types[3]]](6, 5, 'enemy'),
+            UNIT_CLASSES[UNIT_TYPES[self.unit_types[4]]](6, 6, 'enemy'),
+            UNIT_CLASSES[UNIT_TYPES[self.unit_types[5]]](5, 7, 'enemy'),
         ]
 
 
