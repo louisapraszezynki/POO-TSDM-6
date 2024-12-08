@@ -32,8 +32,7 @@ class Game:
         ]
 
         # Initialisation des unit types affichés dans le menu personnages
-        # On veut mettre à jour cette liste pour que ça se change de manière dynamique
-        # en appuyant sur la fleche droite
+        # On veut mettre à jour cette liste pour que ça se change de manière dynamique en appuyant sur la fleche droite
         self.unit_types = [0, 0, 0, 0, 0, 0]
 
         self.selected_attack_position = [1, 1]
@@ -410,13 +409,24 @@ class Game:
 
                     if target is None:
                         image = IMAGES['attack']
+                        self.screen.blit(image, (x * CELL_SIZE, y * CELL_SIZE))
+
                     elif target.team == 'player':
                         image = IMAGES['ally']
+                        for i in range(0, unit.skills[0].area_of_effect):
+                            self.screen.blit(image, (x * CELL_SIZE + i * CELL_SIZE, y * CELL_SIZE))
+                            self.screen.blit(image, (x * CELL_SIZE, y * CELL_SIZE + i * CELL_SIZE))
+                            self.screen.blit(image, (x * CELL_SIZE - i * CELL_SIZE, y * CELL_SIZE))
+                            self.screen.blit(image, (x * CELL_SIZE, y * CELL_SIZE - i * CELL_SIZE))
+
                     elif target.team == 'enemy':
-                        image = IMAGES['enemy']      
-
-                    self.screen.blit(image, (x * CELL_SIZE, y * CELL_SIZE))
-
+                        image = IMAGES['enemy']
+                        for i in range(0, unit.skills[0].area_of_effect):
+                            self.screen.blit(image, (x * CELL_SIZE + i * CELL_SIZE, y * CELL_SIZE))
+                            self.screen.blit(image, (x * CELL_SIZE, y * CELL_SIZE + i * CELL_SIZE))
+                            self.screen.blit(image, (x * CELL_SIZE - i * CELL_SIZE, y * CELL_SIZE))
+                            self.screen.blit(image, (x * CELL_SIZE, y * CELL_SIZE - i * CELL_SIZE))
+      
 
                 if unit.action_2_selected:
                     unit.draw_selected_stat(self.screen)
@@ -426,12 +436,23 @@ class Game:
 
                     if target is None:
                         image = IMAGES['attack']
+                        self.screen.blit(image, (x * CELL_SIZE, y * CELL_SIZE))
+
                     elif target.team == 'player':
                         image = IMAGES['ally']
-                    elif target.team == 'enemy':
-                        image = IMAGES['enemy']      
+                        for i in range(0, unit.skills[0].area_of_effect):
+                            self.screen.blit(image, (x * CELL_SIZE + i * CELL_SIZE, y * CELL_SIZE))
+                            self.screen.blit(image, (x * CELL_SIZE, y * CELL_SIZE + i * CELL_SIZE))
+                            self.screen.blit(image, (x * CELL_SIZE - i * CELL_SIZE, y * CELL_SIZE))
+                            self.screen.blit(image, (x * CELL_SIZE, y * CELL_SIZE - i * CELL_SIZE))
 
-                    self.screen.blit(image, (x * CELL_SIZE, y * CELL_SIZE))
+                    elif target.team == 'enemy':
+                        image = IMAGES['enemy']
+                        for i in range(0, unit.skills[0].area_of_effect):
+                            self.screen.blit(image, (x * CELL_SIZE + i * CELL_SIZE, y * CELL_SIZE))
+                            self.screen.blit(image, (x * CELL_SIZE, y * CELL_SIZE + i * CELL_SIZE))
+                            self.screen.blit(image, (x * CELL_SIZE - i * CELL_SIZE, y * CELL_SIZE))
+                            self.screen.blit(image, (x * CELL_SIZE, y * CELL_SIZE - i * CELL_SIZE))
 
         # Affiche les équipes sur le côté droit de l'écran
         for unit in self.player_units:
