@@ -459,7 +459,12 @@ class Game:
 
                     self.screen.blit(image, (x * CELL_SIZE, y * CELL_SIZE))
 
-
+        # Affiche les équipes sur le côté droit de l'écran
+        for unit in self.player_units:
+            unit.draw_teams(self.screen)
+        
+        for ennemy in self.enemy_units:
+            ennemy.draw_ennemies(self.screen)
 
         # Rafraîchit l'affichage
         pygame.display.flip()

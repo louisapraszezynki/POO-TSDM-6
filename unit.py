@@ -86,12 +86,12 @@ class Unit:
         gauche_de_case = self.x * CELL_SIZE + (CELL_SIZE - UNIT_CELL_SIZE) / 2
         haut_de_case = self.y * CELL_SIZE + (CELL_SIZE - UNIT_CELL_SIZE) / 2
         
-        # Si le personnage actuellement en train d'être selectionné est celui-ci, alors on fait un carré rouge
+        # Si le personnage actuellement en train d'être selectionné est celui-ci, alors on fait un carré bleu
         # un peu plus large derrière pour le distinguer
         if selected:
             pygame.draw.rect(
                 screen, 
-                RED, 
+                BLUE, 
                 (gauche_de_case - 2, haut_de_case - 2, UNIT_CELL_SIZE + 4, UNIT_CELL_SIZE + 4), 
                 width=3
             )
@@ -143,10 +143,33 @@ class Unit:
                 width=3
             )
 
+    def display_ennemies(self,
+        screen,
+        position,
+        selected: bool
+    ):
+        
+        largeur = WIDTH - (CELL_SIZE - 5)
+        hauteur = HEIGHT - (CELL_SIZE * position) - 10
+
+        screen.blit(UNIT_IMAGES[self.unit_type], (largeur , hauteur))
+        if selected:
+            pygame.draw.rect(
+                screen, 
+                BLUE, 
+                (largeur - 2, hauteur - 2, UNIT_CELL_SIZE + 4, UNIT_CELL_SIZE + 4), 
+                width=3
+            )
+
     def draw(self, screen):
         self.display_character_on_map(screen, self.is_selected)
         self.draw_health_bar(screen)
+
+    def draw_teams(self, screen):
         self.display_teams(screen, self.position, self.is_selected)
+    
+    def draw_ennemies(self, screen):
+        self.display_ennemies(screen, self.position, self.is_selected)
 
 # Dessins joueur par joueur
     def draw_stats(self, screen):
