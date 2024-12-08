@@ -8,12 +8,13 @@ def display_character_in_menu(
     screen,
     coordinates,
     class_type,
-    selected: bool,
+    selected,
+    team
 ):
     # Si le personnage actuellement en train d'être selectionné est celui-ci, alors on fait un carré blanc
     # un peu plus large derrière pour le distinguer
     if selected:
-        pygame.draw.rect(screen, RED,
+        pygame.draw.rect(screen, RED if team == 'enemy' else BLUE,
                          (coordinates.x - 2, coordinates.y - 2, coordinates.width + 4, coordinates.height + 4), width=3)
 
         unit_class = UNIT_CLASSES[class_type]

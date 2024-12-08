@@ -210,7 +210,7 @@ class Game:
                 # On récupère le type sous forme de chaîne de caractère
                 current_unit_type = UNIT_TYPES[current_unit_type]
 
-                display_character_in_menu(self.screen, coordinates, current_unit_type, character_index == self.selected_character_in_menu)
+                display_character_in_menu(self.screen, coordinates, current_unit_type, character_index == self.selected_character_in_menu, team='player')
                 # On passe au personnage suivant, alors on augmente le character index
                 character_index += 1
 
@@ -220,7 +220,7 @@ class Game:
                 # On récupère le type sous forme de chaîne de caractère
                 current_unit_type = UNIT_TYPES[current_unit_type]
 
-                display_character_in_menu(self.screen, coordinates, current_unit_type, character_index == self.selected_character_in_menu)
+                display_character_in_menu(self.screen, coordinates, current_unit_type, character_index == self.selected_character_in_menu, team='enemy')
                 # On passe au personnage suivant, alors on augmente le character index
                 character_index += 1
 
@@ -514,7 +514,7 @@ def main():
         game.handle_enemy_turn()
 
 
-    result = "You have lost" if not game.player_units else "You have won"
+    result = "You have lost :(" if not game.player_units else "You have won :)"
 
     while True:
         game_results = game.show_results(result)
