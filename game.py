@@ -144,12 +144,12 @@ class Game:
 
             # On dessine le bouton start avec pour but qu'il soit au milieu, à gauche de l'écran
             start_button = pygame.Rect(START_COORDINATES.x, START_COORDINATES.y, START_COORDINATES.width, START_COORDINATES.height)
-            start_text_surface = font.render('START', False, WHITE)
+            start_text_surface = menu_font.render('START', False, WHITE)
             self.screen.blit(start_text_surface, (START_COORDINATES.x + MARGIN, START_COORDINATES.y))
 
             # On dessine le bouton exit avec pour but qu'il soit au milieu, à droite de l'écran
             exit_button = pygame.Rect(EXIT_COORDINATES.x, EXIT_COORDINATES.y, EXIT_COORDINATES.width, EXIT_COORDINATES.height)
-            exit_text_surface = font.render('EXIT', False, WHITE)
+            exit_text_surface = menu_font.render('EXIT', False, WHITE)
             self.screen.blit(exit_text_surface, (EXIT_COORDINATES.x + MARGIN, EXIT_COORDINATES.y))
 
             # On donne une épaisseur de 5 au bouton s'il est sélectionné, 1 sinon
@@ -212,7 +212,7 @@ class Game:
                 # On récupère le type sous forme de chaîne de caractère
                 current_unit_type = UNIT_TYPES[current_unit_type]
 
-                display_character(self.screen, coordinates, current_unit_type, character_index == self.selected_character_in_menu, in_menu=True)
+                display_character_in_menu(self.screen, coordinates, current_unit_type, character_index == self.selected_character_in_menu)
                 # On passe au personnage suivant, alors on augmente le character index
                 character_index += 1
 
@@ -222,7 +222,7 @@ class Game:
                 # On récupère le type sous forme de chaîne de caractère
                 current_unit_type = UNIT_TYPES[current_unit_type]
 
-                display_character(self.screen, coordinates, current_unit_type, character_index == self.selected_character_in_menu, in_menu=True)
+                display_character_in_menu(self.screen, coordinates, current_unit_type, character_index == self.selected_character_in_menu)
                 # On passe au personnage suivant, alors on augmente le character index
                 character_index += 1
 
@@ -317,7 +317,7 @@ class Game:
         accessible_cells = unit.get_action_range(action_range)
         for x, y in accessible_cells:
             rect = pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
-            pygame.draw.rect(self.screen, BLUE, rect, 2)  # Bordure bleue pour indiquer la portée
+            pygame.draw.rect(self.screen, BLUE, rect, 2)  # Bordure bleue pour indiquer la portée de l'action
 
     #### DESSIN DE L'ECRAN ####
 
@@ -339,13 +339,41 @@ class Game:
             if unit.is_selected:
                 unit.draw_stats(self.screen)
 
+                x = unit.x + self.selected_attack_position[0]
+                y = unit.y + self.selected_attack_position[1]
+
                 if unit.action_1_selected:
                     unit.draw_selected_stat(self.screen)
                     self.draw_range(unit, unit.skills[0].range)  # Affiche la portée de l'action 1
 
+                    target = self.target_unit(x, y)
+
+                    if target is None:
+                        image = IMAGES['attack']
+                    elif target.team == 'player':
+                        image = IMAGES['ally']
+                    elif target.team == 'enemy':
+                        image = IMAGES['enemy']      
+
+                    self.screen.blit(image, (x * CELL_SIZE, y * CELL_SIZE))
+
+
                 if unit.action_2_selected:
                     unit.draw_selected_stat(self.screen)
                     self.draw_range(unit, unit.skills[1].range)  # Affiche la portée de l'action 2
+
+                    target = self.target_unit(x, y)
+
+                    if target is None:
+                        image = IMAGES['attack']
+                    elif target.team == 'player':
+                        image = IMAGES['ally']
+                    elif target.team == 'enemy':
+                        image = IMAGES['enemy']      
+
+                    self.screen.blit(image, (x * CELL_SIZE, y * CELL_SIZE))
+
+
 
         # Rafraîchit l'affichage
         pygame.display.flip()

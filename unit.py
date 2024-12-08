@@ -4,7 +4,7 @@ from utilitaires import *
 
 
 # Affichage des types d'unités dans le menu de sélection des personnages
-def display_character(
+def display_character_in_menu(
     screen,
     coordinates,
     class_type,
@@ -20,15 +20,13 @@ def display_character(
         unit_class = UNIT_CLASSES[class_type]
         health = unit_class.health
         attack_power = unit_class.attack_power
-        full_string = f"Health: {health}, Attack power: {attack_power}"
+        speed = unit_class.speed
+        full_string = f"Health: {health}, Attack power: {attack_power}, Speed: {speed}"
 
-        start_text_surface = font.render(full_string, False, WHITE)
+        start_text_surface = menu_font.render(full_string, False, WHITE)
         screen.blit(start_text_surface, (MARGIN, HEIGHT - 50))
 
-    if in_menu:
-        screen.blit(MENU_UNIT_IMAGES[class_type], (coordinates.x, coordinates.y))
-    else:
-        screen.blit(UNIT_IMAGES[class_type], (coordinates.x, coordinates.y))
+    screen.blit(MENU_UNIT_IMAGES[class_type], (coordinates.x, coordinates.y))
 
 
 #### SuperClasse d'attaques ####
@@ -72,6 +70,36 @@ class Unit:
         self.is_selected = False
         self.action_1_selected = False
         self.action_2_selected = False
+        self.already_attacked = False
+        self.movement_this_turn = 0
+
+    # Affichage des types d'unités dans le menu de sélection des personnages
+    def display_character_on_map(
+        self,
+        screen,
+        selected: bool,
+    ):
+       
+        gauche_de_case = self.x * CELL_SIZE + (CELL_SIZE - UNIT_CELL_SIZE) / 2
+        haut_de_case = self.y * CELL_SIZE + (CELL_SIZE - UNIT_CELL_SIZE) / 2
+        
+        # Si le personnage actuellement en train d'être selectionné est celui-ci, alors on fait un carré rouge
+        # un peu plus large derrière pour le distinguer
+        if selected:
+            pygame.draw.rect(
+                screen, 
+                RED, 
+                (gauche_de_case - 2, haut_de_case - 2, UNIT_CELL_SIZE + 4, UNIT_CELL_SIZE + 4), 
+                width=3
+            )
+
+            movement_left = max(0, self.speed - self.movement_this_turn)
+            full_string = f"Health: {self.health}, Attack power: {self.attack_power}, Movement left: {movement_left}"
+
+            start_text_surface = grid_font.render(full_string, False, WHITE)
+            screen.blit(start_text_surface, (MARGIN, HEIGHT - 50))
+
+        screen.blit(UNIT_IMAGES[self.unit_type], (gauche_de_case, haut_de_case))
 
 # Dessins permanents
     def draw_health_bar(self, screen):
@@ -80,44 +108,42 @@ class Unit:
         bar_width = CELL_SIZE - 10
         bar_height = 5
         bar_x = self.x * CELL_SIZE + 5
-        bar_y = self.y * CELL_SIZE - bar_height - 2
+        bar_y = self.y * CELL_SIZE + bar_height - 2
 
         # Calcul de la largeur de la barre en fonction des PV restants
         health_percentage = (self.health*100) / self.max_health
         current_bar_width = int((health_percentage*bar_width)/100)
 
+        # Barre d'équipe
+        pygame.draw.rect(screen, BLUE if self.team == 'player' else RED, (bar_x - 2, bar_y - 2, bar_width + 4, bar_height + 4))
+
         # Barre de fond (rouge)
-        pygame.draw.rect(screen, (255, 0, 0), (bar_x, bar_y, bar_width, bar_height))
+        pygame.draw.rect(screen, RED, (bar_x, bar_y, bar_width, bar_height))
 
         # Barre de vie (vert)
-        pygame.draw.rect(screen, (0, 255, 0), (bar_x, bar_y, current_bar_width, bar_height))
+        pygame.draw.rect(screen, GREEN, (bar_x, bar_y, current_bar_width, bar_height))
 
     def draw(self, screen):
         """Affiche l'unité sur l'écran."""
-        gauche_de_case = self.x * CELL_SIZE + (CELL_SIZE - UNIT_CELL_SIZE) / 2
-        haut_de_case = self.y * CELL_SIZE + (CELL_SIZE - UNIT_CELL_SIZE) / 2
-
-        coordinates = Coordinates(gauche_de_case, haut_de_case, UNIT_CELL_SIZE, UNIT_CELL_SIZE)
-        display_character(screen, coordinates, self.unit_type, self.is_selected)
-
+        self.display_character_on_map(screen, self.is_selected)
         self.draw_health_bar(screen)
 
 # Dessins joueur par joueur
     def draw_stats(self, screen):
         action_string = f"Action possible 1 : {self.actions[0]}, Action possible 2 : {self.actions[1]}"
-        start_text_surface = font.render(action_string, False, WHITE)
+        start_text_surface = grid_font.render(action_string, False, WHITE)
         screen.blit(start_text_surface, (MARGIN, HEIGHT - 100))
     
     def draw_selected_stat(self, screen):
         if self.action_1_selected is True :
-            action_string = f"Action sélectionnée 1 : {self.actions[0]}"
-            start_text_surface = font.render(action_string, False, RED)
-            screen.blit(start_text_surface, (MARGIN, HEIGHT - 200))
+            action_string = f"Action sélectionnée : {self.actions[0]}"
+            start_text_surface = grid_font.render(action_string, False, BLUE)
+            screen.blit(start_text_surface, (MARGIN, HEIGHT - 75))
         
         if self.action_2_selected is True:
-            action_string = f"Action possible 2 : {self.actions[1]}"
-            start_text_surface = font.render(action_string, False, RED)
-            screen.blit(start_text_surface, (MARGIN, HEIGHT - 200))
+            action_string = f"Action sélectionnée : {self.actions[1]}"
+            start_text_surface = grid_font.render(action_string, False, BLUE)
+            screen.blit(start_text_surface, (MARGIN, HEIGHT - 75))
 
 
 
