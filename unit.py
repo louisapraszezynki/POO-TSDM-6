@@ -76,34 +76,6 @@ class Unit:
         self.movement_this_turn = 0
         self.position = position
 
-    # Affichage des types d'unités sur la map
-    def display_character_on_map(
-        self,
-        screen,
-        selected: bool,
-    ):
-       
-        gauche_de_case = self.x * CELL_SIZE + (CELL_SIZE - UNIT_CELL_SIZE) / 2
-        haut_de_case = self.y * CELL_SIZE + (CELL_SIZE - UNIT_CELL_SIZE) / 2
-        
-        # Si le personnage actuellement en train d'être selectionné est celui-ci, alors on fait un carré bleu
-        # un peu plus large derrière pour le distinguer
-        if selected:
-            pygame.draw.rect(
-                screen, 
-                BLUE, 
-                (gauche_de_case - 2, haut_de_case - 2, UNIT_CELL_SIZE + 4, UNIT_CELL_SIZE + 4), 
-                width=3
-            )
-
-            movement_left = max(0, self.speed - self.movement_this_turn)
-            full_string = f"Health: {self.health}    Attack power: {self.attack_power}    Movement left: {movement_left}"
-
-            start_text_surface = grid_font.render(full_string, False, WHITE)
-            screen.blit(start_text_surface, (MARGIN, HEIGHT - 40))
-
-        screen.blit(UNIT_IMAGES[self.unit_type], (gauche_de_case, haut_de_case))
-
 # Dessins permanents
     def draw_health_bar(self, screen):
         # Position de la barre (au-dessus de l'unité)
@@ -171,6 +143,33 @@ class Unit:
     def draw_ennemies(self, screen):
         self.display_ennemies(screen, self.position, self.is_selected)
 
+    def display_character_on_map(
+        self,
+        screen,
+        selected: bool,
+    ):
+       
+        gauche_de_case = self.x * CELL_SIZE + (CELL_SIZE - UNIT_CELL_SIZE) / 2
+        haut_de_case = self.y * CELL_SIZE + (CELL_SIZE - UNIT_CELL_SIZE) / 2
+        
+        # Si le personnage actuellement en train d'être selectionné est celui-ci, alors on fait un carré bleu
+        # un peu plus large derrière pour le distinguer
+        if selected:
+            pygame.draw.rect(
+                screen, 
+                BLUE, 
+                (gauche_de_case - 2, haut_de_case - 2, UNIT_CELL_SIZE + 4, UNIT_CELL_SIZE + 4), 
+                width=3
+            )
+
+            movement_left = max(0, self.speed - self.movement_this_turn)
+            full_string = f"Health: {self.health}    Attack power: {self.attack_power}    Movement left: {movement_left}"
+
+            start_text_surface = grid_font.render(full_string, False, WHITE)
+            screen.blit(start_text_surface, (MARGIN, HEIGHT - 40))
+
+        screen.blit(UNIT_IMAGES[self.unit_type], (gauche_de_case, haut_de_case))
+
 # Dessins joueur par joueur
     def draw_stats(self, screen):
         action_string = f"Action 1 (A): {self.actions[0]}      Action 2 (Z): {self.actions[1]}"
@@ -187,7 +186,6 @@ class Unit:
             action_string = f"Selected action : {self.actions[1]}"
             start_text_surface = grid_font.render(action_string, False, BLUE)
             screen.blit(start_text_surface, (MARGIN, HEIGHT - 65))
-
 
 
 # Actions
@@ -251,7 +249,6 @@ class Unit:
 
         self.already_attacked = True
 
-
     def get_action_range(self, action_range):
         # Retourne les coordonnées accessibles en fonction de la portée
         accessible_cells = []
@@ -312,34 +309,4 @@ UNIT_CLASSES = {
     'MAGE': Mage,
     'CHEVALIER': Chevalier,
     'ARCHER': Archer,
-}
-
-MENU_UNIT_IMAGES = {
-    "MAGE": pygame.transform.scale(
-        pygame.image.load("images/mage.png"),
-        (MENU_UNIT_CELL_SIZE, MENU_UNIT_CELL_SIZE)
-    ),
-    "CHEVALIER": pygame.transform.scale(
-        pygame.image.load("images/knight.png"),
-        (MENU_UNIT_CELL_SIZE, MENU_UNIT_CELL_SIZE)
-    ),
-    "ARCHER": pygame.transform.scale(
-        pygame.image.load("images/archer.png"),
-        (MENU_UNIT_CELL_SIZE, MENU_UNIT_CELL_SIZE)
-    ),
-}
-
-UNIT_IMAGES = {
-    "MAGE": pygame.transform.scale(
-        pygame.image.load("images/mage.png"),
-        (UNIT_CELL_SIZE, UNIT_CELL_SIZE)
-    ),
-    "CHEVALIER": pygame.transform.scale(
-        pygame.image.load("images/knight.png"),
-        (UNIT_CELL_SIZE, UNIT_CELL_SIZE)
-    ),
-    "ARCHER": pygame.transform.scale(
-        pygame.image.load("images/archer.png"),
-        (UNIT_CELL_SIZE, UNIT_CELL_SIZE)
-    ),
 }

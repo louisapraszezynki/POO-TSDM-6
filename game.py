@@ -2,53 +2,7 @@ import pygame
 import random
 
 from unit import *
-from terrain import TERRAIN_TYPES
 from utilitaires import *
-
-
-##################################### CONSTANTES POUR LE MENU #####################################
-MENU_ITEM_WIDTH = 150
-MENU_ITEM_HEIGHT = 50
-
-HALF_WIDTH = WIDTH / 2
-HALF_HEIGHT = HEIGHT / 2
-
-START_COORDINATES = Coordinates(
-    x = HALF_WIDTH - MARGIN - MENU_ITEM_WIDTH,
-    y = HALF_HEIGHT - MENU_ITEM_HEIGHT / 2,
-    width = MENU_ITEM_WIDTH,
-    height = MENU_ITEM_HEIGHT
-)
-
-EXIT_COORDINATES = Coordinates(
-    x = HALF_WIDTH + MARGIN,
-    y = HALF_HEIGHT - MENU_ITEM_HEIGHT / 2,
-    width = MENU_ITEM_WIDTH,
-    height = MENU_ITEM_HEIGHT
-)
-
-
-############################# CONSTANTES POUR LA SELECTION DE JOUEURS #############################
-
-THIRD_OF_WIDTH = int(WIDTH / 3)
-SIXTH_OF_WIDTH = int(WIDTH / 6)
-THIRD_OF_HEIGHT = int(HEIGHT / 3)
-
-PLAYER_0_MENU_COORDINATES = [Coordinates(
-    x = THIRD_OF_WIDTH * i + SIXTH_OF_WIDTH - MENU_UNIT_CELL_SIZE / 2,
-    y = THIRD_OF_HEIGHT - MENU_UNIT_CELL_SIZE / 2,
-    width = MENU_UNIT_CELL_SIZE,
-    height = MENU_UNIT_CELL_SIZE
-) for i in range(NUM_PLAYERS_0)]
-
-# La seule chose différente par rapport à au-dessus est le y -> 2/3 de la hauteur au lieu de 1/3
-PLAYER_1_MENU_COORDINATES = [Coordinates(
-    x = THIRD_OF_WIDTH * i + SIXTH_OF_WIDTH - MENU_UNIT_CELL_SIZE / 2,
-    y = THIRD_OF_HEIGHT * 2 - MENU_UNIT_CELL_SIZE / 2,
-    width = MENU_UNIT_CELL_SIZE,
-    height = MENU_UNIT_CELL_SIZE
-) for i in range(NUM_PLAYERS_1)]
-###################################################################################################
 
 
 class Game:
@@ -83,6 +37,7 @@ class Game:
 
         self.selected_attack_position = [1, 1]
 
+    #### INITIALISATION EQUIPES ####
     def init_units(self):
 
         self.player_units = [
@@ -97,8 +52,7 @@ class Game:
             UNIT_CLASSES[UNIT_TYPES[self.unit_types[5]]](5, 7, 'enemy', 5),
         ]
 
-
-    #### MENU DEMARRER - QUITTER ####
+    #### MENU STRAT EXIT ####
     def show_menu(self):
         
         self.screen.fill(BLACK) # Remplit l'écran en noir
@@ -148,7 +102,7 @@ class Game:
 
         return False
 
-    #### SELECTION DES PERSONNAGES ####
+    #### MENU SELECTION DES PERSONNAGES ####
     def select_characters(self):
 
         # On commence par remplir l'écran de noir
@@ -329,6 +283,30 @@ class Game:
 
                         self.flip_display()
 
+    def handle_enemy_turn(self):
+        """IA très simple pour les ennemis."""
+        for enemy in self.enemy_units:
+
+            # Déplacement aléatoire
+            target = random.choice(self.player_units)
+            dx = 1 if enemy.x < target.x else -1 if enemy.x > target.x else 0
+            dy = 1 if enemy.y < target.y else -1 if enemy.y > target.y else 0
+            enemy.move(dx, dy , self.terrain_grid, self.get_unit_positions())
+
+            viable_attacks = [skill for skill in enemy.skills if skill.attack_type != 'regen']
+
+            # Attaque si possible
+            if abs(enemy.x - target.x) <= 1 and abs(enemy.y - target.y) <= 1:
+                enemy.attack(random.choice(viable_attacks), target)
+                if target.health <= 0:
+                    self.player_units.remove(target)
+
+                if not self.player_units or not self.enemy_units:
+                    return
+            
+            enemy.already_attacked = False
+
+    #### FIN DE LA PARTIE ####
     def show_results(self, result):
         self.screen.fill(BLACK) # Remplit l'écran en noir
 
@@ -346,7 +324,7 @@ class Game:
             
             pygame.display.flip()
 
-
+    #### HELPERS METHODS ####
     def dead_or_alive(self):
         # Regarde si des joueurs sont morts et les supprime de leur équipe respective
         for player in self.player_units:
@@ -375,29 +353,6 @@ class Game:
             if enemy.x == x and enemy.y == y:
                 return enemy
 
-    def handle_enemy_turn(self):
-        """IA très simple pour les ennemis."""
-        for enemy in self.enemy_units:
-
-            # Déplacement aléatoire
-            target = random.choice(self.player_units)
-            dx = 1 if enemy.x < target.x else -1 if enemy.x > target.x else 0
-            dy = 1 if enemy.y < target.y else -1 if enemy.y > target.y else 0
-            enemy.move(dx, dy , self.terrain_grid, self.get_unit_positions())
-
-            viable_attacks = [skill for skill in enemy.skills if skill.attack_type != 'regen']
-
-            # Attaque si possible
-            if abs(enemy.x - target.x) <= 1 and abs(enemy.y - target.y) <= 1:
-                enemy.attack(random.choice(viable_attacks), target)
-                if target.health <= 0:
-                    self.player_units.remove(target)
-
-                if not self.player_units or not self.enemy_units:
-                    return
-            
-            enemy.already_attacked = False
-
     def draw_range(self, unit, action_range):
         """Dessine les cases accessibles pour une unité donnée."""
         accessible_cells = unit.get_action_range(action_range)
@@ -405,7 +360,7 @@ class Game:
             rect = pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
             pygame.draw.rect(self.screen, BLUE, rect, 2)  # Bordure bleue pour indiquer la portée de l'action
 
-    #### DESSIN DE L'ECRAN ####
+    #### DESSINS ####
     def flip_display(self):
         # Remplit l'écran en noir
         self.screen.fill(BLACK)
@@ -420,7 +375,6 @@ class Game:
         # Affiche les unités sur la grille
         for unit in self.player_units + self.enemy_units:
             unit.draw(self.screen)
-
 
             if unit.is_selected:
                 unit.draw_stats(self.screen)
@@ -470,7 +424,7 @@ class Game:
         pygame.display.flip()
 
 
-#### Main ####
+#### MAIN ####
 def main():
 
     # Initialisation de Pygame
