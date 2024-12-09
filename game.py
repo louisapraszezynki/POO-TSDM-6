@@ -213,7 +213,10 @@ class Game:
                                     selected_unit.movement_this_turn += 1
                                     for object in self.objects:
                                         if (selected_unit.x, selected_unit.y) == (object.x, object.y):
-                                            selected_unit.health += object.health
+                                            if selected_unit.health + object.health <= selected_unit.max_health:
+                                                selected_unit.health += object.health
+                                            elif selected_unit.health + object.health > selected_unit.max_health:
+                                                selected_unit.health = selected_unit.max_health
                                             object.is_used = True
 
                             self.dead_or_alive()
