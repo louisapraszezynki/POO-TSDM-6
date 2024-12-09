@@ -1,7 +1,8 @@
 import pygame
 from utilitaires import *
+from abc import ABC
 
-class Object:
+class Object(ABC):
     pass
 
 class Apple(Object):
