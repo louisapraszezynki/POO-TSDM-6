@@ -26,7 +26,28 @@ def display_character_in_menu(
         start_text_surface = menu_font.render(full_string, False, WHITE)
         screen.blit(start_text_surface, (MARGIN, HEIGHT - 50))
 
+    # Affichage de l'image de l'unité
     screen.blit(MENU_UNIT_IMAGES[class_type], (coordinates.x, coordinates.y))
+
+    # Récupération du nom de l'unité
+    unit_class = UNIT_CLASSES[class_type]
+    unit_name = unit_class.name
+
+    # Dessiner le rectangle rouge derrière le texte
+    name_text_surface = grid_font.render(unit_name, False, WHITE)
+    text_x = coordinates.x + (coordinates.width - name_text_surface.get_width()) / 2
+    text_y = coordinates.y + coordinates.height + 5
+
+    # Dessiner le rectangle rouge
+    pygame.draw.rect(
+        screen,
+        RED,
+        (text_x - 5, text_y - 5, name_text_surface.get_width() + 10, name_text_surface.get_height() + 10)
+    )
+
+    # Afficher le nom de l'unité par-dessus le rectangle
+    screen.blit(name_text_surface, (text_x, text_y))
+
 
 
 #### SuperClasse d'attaques ####
@@ -278,6 +299,7 @@ class Unit:
 
 # Sous classes des Unités
 class Mage(Unit):
+    name = 'Mage'
     health = 100
     max_health = 100
     attack_power = 100
@@ -294,6 +316,7 @@ class Mage(Unit):
 
 
 class Chevalier(Unit):
+    name = 'Chevalier'
     health = 120
     max_health = 120
     attack_power = 120
@@ -310,6 +333,7 @@ class Chevalier(Unit):
 
 
 class Archer(Unit):
+    name = 'Archer'
     health = 100
     max_health = 100
     attack_power = 80
