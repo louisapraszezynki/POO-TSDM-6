@@ -226,11 +226,11 @@ class Game:
 
                         else:
                             if selected_unit.action_1_selected:
-                                range = selected_unit.skills[0].range
+                                skill_range = selected_unit.skills[0].range
                             elif selected_unit.action_2_selected:
-                                range = selected_unit.skills[1].range
+                                skill_range = selected_unit.skills[1].range
 
-                            accessible_cells = selected_unit.get_action_range(range)
+                            accessible_cells = selected_unit.get_action_range(skill_range)
 
                             current_x = selected_unit.x + self.selected_attack_position[0]
                             current_y = selected_unit.y + self.selected_attack_position[1]
@@ -266,21 +266,52 @@ class Game:
                             self.selected_attack_position = [0, 0]
 
                         elif event.key == pygame.K_SPACE:
+
+                            if selected_unit.action_1_selected:
+                                selected_skill = selected_unit.skills[0]
+
+                            elif selected_unit.action_2_selected:
+                                selected_skill = selected_unit.skills[1]
+
+                            else:
+                                raise ValueError("Invalid skill")
+
                             current_x = selected_unit.x + self.selected_attack_position[0]
                             current_y = selected_unit.y + self.selected_attack_position[1]
 
-                            target = self.target_unit(current_x, current_y)
+                            print(current_x, current_y)
 
-                            if target is not None:
-                                if selected_unit.action_1_selected:
-                                    selected_unit.attack(selected_unit.skills[0], target)
-                                elif selected_unit.action_2_selected:
-                                    selected_unit.attack(selected_unit.skills[1], target)
+                            selected_area_of_effect = []
+                            print(selected_skill.area_of_effect)
+                            for i in range(0, selected_skill.area_of_effect):
+                                selected_area_of_effect.append((current_x + i, current_y))
+                                selected_area_of_effect.append((current_x, current_y + i))
+                                selected_area_of_effect.append((current_x - i, current_y))
+                                selected_area_of_effect.append((current_x, current_y - i))
+                            
+                            selected_area_of_effect = set(selected_area_of_effect)
+
+                            units = self.get_unit_positions()
+                            
+                            units_in_area_of_effect = []
+                            for unit in units:
+                                if unit in selected_area_of_effect:
+                                    units_in_area_of_effect.append(unit)
+                                                        
+                            targets = []
+                            for unit in units_in_area_of_effect:
+                                targets.append(self.target_unit(unit[0], unit[1]))
+
+                            for target in targets:
+                                print("Targets", target)
+                                selected_unit.attack(selected_skill, target)
                                 
                                 self.dead_or_alive()
 
                                 if not self.player_units or not self.enemy_units:
                                     return
+                            
+                            selected_unit.already_attacked = True
                             
                         # Mettre fin au tour
                         elif event.key == pygame.K_RETURN:
@@ -313,6 +344,7 @@ class Game:
 
             if abs((enemy.x - target.x) + (enemy.y - target.y)) <= range:
                 enemy.attack(enemy_attack, target)
+                enemy.already_attacked = True
 
                 if target.health <= 0:
                     self.player_units.remove(target)
@@ -443,7 +475,7 @@ class Game:
 
                     elif target.team == 'player':
                         image = IMAGES['ally']
-                        for i in range(0, unit.skills[0].area_of_effect):
+                        for i in range(0, unit.skills[1].area_of_effect):
                             self.screen.blit(image, (x * CELL_SIZE + i * CELL_SIZE, y * CELL_SIZE))
                             self.screen.blit(image, (x * CELL_SIZE, y * CELL_SIZE + i * CELL_SIZE))
                             self.screen.blit(image, (x * CELL_SIZE - i * CELL_SIZE, y * CELL_SIZE))

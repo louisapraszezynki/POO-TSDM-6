@@ -245,6 +245,7 @@ class Unit:
         return True
 
     def attack(self, skill, target):
+        print(self.already_attacked, target)
 
         if self.already_attacked:
             return
@@ -257,6 +258,8 @@ class Unit:
 
         attack = skill_power + skill_power * (attack_power / 100)
 
+        print(attack)
+
         # Degats qu'on enleve des degats finaux = on se protege
         resistances = target.resistance
 
@@ -265,6 +268,9 @@ class Unit:
 
         # Esquive de la cible ?
         chiffre_esquive = random.randint(0, 100)
+
+        print(chiffre_esquive, self.esquive)
+        print(total_attack)
 
         if chiffre_esquive < self.esquive:
             pass
@@ -282,8 +288,6 @@ class Unit:
         # Pour pas que les unit aient plus de 100% de leur vie
         if target.health > target.max_health:
             target.health = target.max_health
-
-        self.already_attacked = True
 
     def get_action_range(self, action_range):
         # Retourne les coordonnées accessibles en fonction de la portée
@@ -337,14 +341,14 @@ class Archer(Unit):
     health = 100
     max_health = 100
     attack_power = 80
-    resistance = 12
+    resistance = 5
     speed = 3
     esquive = 30
     crit = 15
     unit_type = 'ARCHER'
     actions = ['Weapon', 'Regen']
     skills = [
-        Weapon('weapon', 6, 6, 2), # attack_type:str, range:int, power:int, area_of_effect:int
+        Weapon('weapon', 6, 8, 2), # attack_type:str, range:int, power:int, area_of_effect:int
         Regen('regen', 1, 2, 1) # attack_type:str, range:int, power:int, area_of_effect:int
     ]
 
