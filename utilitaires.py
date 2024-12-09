@@ -56,6 +56,10 @@ IMAGES = {
         (CELL_SIZE, CELL_SIZE)
     ),
 }
+MENU_BACKGROUND = pygame.transform.scale(
+    pygame.image.load("images/background.png"),
+    (WIDTH, HEIGHT)
+)
 
 TERRAIN_TYPES = {
     "plain": pygame.transform.scale(

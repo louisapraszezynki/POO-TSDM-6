@@ -57,8 +57,8 @@ class Game:
 
     #### MENU STRAT EXIT ####
     def show_menu(self):
-        
-        self.screen.fill(BLACK) # Remplit l'écran en noir
+
+        self.screen.blit(MENU_BACKGROUND, (0, 0))  # Dessine l'image de fond
 
         # On boucle à travers les événements PyGame
         for event in pygame.event.get():
