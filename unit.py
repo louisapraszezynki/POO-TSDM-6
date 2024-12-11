@@ -2,7 +2,7 @@ import pygame
 from utilitaires import *
 import random
 
-
+#### Helpers methods ####
 # Affichage des types d'unités dans le menu de sélection des personnages
 def display_character_in_menu(
     screen,
@@ -72,10 +72,10 @@ class Weapon(Skills):
 
 class Regen(Skills):
     def __init__(self, attack_type, range, power, area_of_effect):
-        # La Regen utilise un power négatif
-        # Un type avec des grosses résis se fera plus heal
+        # Regen utilise un power négatif
         super().__init__(attack_type, range, power, area_of_effect)
         self.attack_type = 'regen'
+
 
 
 #### SuperClasse des Unités ###
@@ -97,6 +97,7 @@ class Unit:
         self.movement_this_turn = 0
         self.position = position
 
+# Dessins
 # Dessins permanents
     def draw_health_bar(self, screen):
         # Position de la barre (au-dessus de l'unité)
@@ -245,7 +246,6 @@ class Unit:
         return True
 
     def attack(self, skill, target):
-        print(self.already_attacked, target)
 
         if self.already_attacked:
             return
@@ -258,7 +258,6 @@ class Unit:
 
         attack = skill_power + skill_power * (attack_power / 100)
 
-        print(attack)
 
         # Degats qu'on enleve des degats finaux = on se protege
         resistances = target.resistance
@@ -268,9 +267,6 @@ class Unit:
 
         # Esquive de la cible ?
         chiffre_esquive = random.randint(0, 100)
-
-        print(chiffre_esquive, self.esquive)
-        print(total_attack)
 
         if chiffre_esquive < self.esquive:
             pass
@@ -289,6 +285,8 @@ class Unit:
         if target.health > target.max_health:
             target.health = target.max_health
 
+
+# Helper method
     def get_action_range(self, action_range):
         # Retourne les coordonnées accessibles en fonction de la portée
         accessible_cells = []
@@ -318,7 +316,6 @@ class Mage(Unit):
         Regen('regen', 3, -7, 3) # attack_type:str, range:int, power:int, area_of_effect:int
     ]
 
-
 class Chevalier(Unit):
     name = 'Chevalier'
     health = 120
@@ -334,7 +331,6 @@ class Chevalier(Unit):
         Weapon('weapon', 1, 15, 1), # attack_type:str, range:int, power:int, area_of_effect:int
         Regen('regen', 1, 3, 1) # attack_type:str, range:int, power:int, area_of_effect:int
     ]
-
 
 class Archer(Unit):
     name = 'Archer'
