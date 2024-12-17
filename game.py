@@ -153,6 +153,7 @@ class Game:
             # On garde un index de personnage pour savoir si on est bien sur celui que nous sommes en train de changer
             character_index = 0
 
+            # Dessins
             for coordinates in PLAYER_0_MENU_COORDINATES:
                 # Le type de l'unit qu'on est actuellement en train de dessiner (0, 1, 2)
                 current_unit_type = self.unit_types[character_index]
@@ -164,7 +165,7 @@ class Game:
                 character_index += 1
 
             for coordinates in PLAYER_1_MENU_COORDINATES:
-                # Le type de l'unit qu'on est actuellement en train de dessiner (0, 1, 2)
+                # Le type de l'unit qu'on est actuellement en train de dessiner (3, 4, 5)
                 current_unit_type = self.unit_types[character_index]
                 # On récupère le type sous forme de chaîne de caractère
                 current_unit_type = UNIT_TYPES[current_unit_type]
@@ -449,7 +450,7 @@ class Game:
                 return enemy
 
     def draw_range(self, unit, action_range):
-        # Dessine les cases accessibles pour une unité donnée
+        # Dessine les cases accessibles pour une action donnée
         accessible_cells = unit.get_action_range(action_range)
         for x, y in accessible_cells:
             rect = pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
